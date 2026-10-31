@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/version_stamp/version_stamp.tscn" id="1_stamp"]
+
+[sub_resource type="ProceduralSky" id="Sky_1"]
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 2
+background_sky = SubResource("Sky_1")
+
+[sub_resource type="PlaneMesh" id="Plane_1"]
+size = Vector2(2.44, 1.6)
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, -0.866025, 0, 0.866025, 0.5, 0, 3, 0)
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 2.2)
+
+[node name="Bed" type="MeshInstance3D" parent="."]
+mesh = SubResource("Plane_1")
+
+[node name="VersionStamp" parent="." instance=ExtResource("1_stamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
