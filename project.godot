@@ -1,0 +1,11 @@
+; Engine configuration file.
+; It is best edited with the editor, but this project bootstraps headless.
+
+config_version=5
+
+[application]
+
+config/name="Open Virtual Pool"
+config/description="A deterministic 8-ball pool game on the virtual pool physics core."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "Forward Plus")
