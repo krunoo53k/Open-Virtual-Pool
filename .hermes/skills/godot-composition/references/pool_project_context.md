@@ -53,7 +53,9 @@ Match (match.tscn, composer)
 - **`MatchState` Resource:** current turn, group assignment, ball-in-hand flag, scores. Passed in and returned, never stored in a global.
 - **Signals out of the rules node:** `turn_changed(player: int)`, `foul_committed(reason: int)`, `ball_in_hand_granted(player: int)`, `groups_assigned(solids_player: int)`, `game_over(winner: int)`. The HUD and `TurnFlow` react; the rules node knows no scenes.
 
-## Decisions to confirm with the user
+## Decisions confirmed by kruno (2026-10-31, for the Open-Virtual-Pool game repo)
 
-1. **Where the rules live.** Recommended default: a Rust module or crate next to the core. It keeps the determinism, fixture and hash-pin discipline, the AI can run rules without Godot, and `GameState` already carries `turn/foul/miscue/winner/game_over`. Godot then only presents a typed `Judgement`. The alternative is a GDScript `EightBallRules` node, which is faster to try but outside the test discipline.
-2. **Extract or start fresh.** The plan assumes the new game grows out of the playground by extraction, with the tests kept green. A fresh project can use the same scene plan.
+1. **Rules:** GDScript `EightBallRules` node in the game repo, headless-tested with JSON fixtures in that repo. The Rust port is a kanban backlog card (#11) before netcode work, not done up front.
+2. **Bootstrap:** fresh scenes in the new repo; it consumes the engine repo's `pool-godot` build (`../Virtual-Pool-Physics-Engine/godot-project/build-extension.sh`); the 61 KB playground `main.gd` is reference only, never ported.
+3. **Ruleset:** strict BCA — called pocket on the 8 (wrong/uncalled 8 = loss), ball-in-hand anywhere on the table, 8-on-break re-rack, >=4 object balls driven to a rail for a legal break.
+4. **Kanban:** the game repo is **GitHub** (`git@github.com:krunoo53k/Open-Virtual-Pool`, gh CLI authed) — NOT Forgejo; column labels `backlog/todo/in-progress/done`, protocol in the label descriptions; cards are issues #1-#11, deps always lower-numbered; one branch `feat/NN-slug` + one PR per card; PR body ends `Closes #NN`.
