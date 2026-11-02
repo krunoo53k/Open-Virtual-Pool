@@ -1,4 +1,4 @@
-extends Node3D
+class_name PoolSimulation extends Node3D
 
 ## The one adapter that wraps the GDExtension.
 ##
