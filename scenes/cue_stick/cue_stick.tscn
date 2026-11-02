@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/cue_stick/cue_stick.gd" id="1_cs"]
+
+[sub_resource type="CylinderMesh" id="CylinderShaft"]
+radius_top = 0.0095
+radius_bottom = 0.003
+height = 1.0
+
+[sub_resource type="CylinderMesh" id="CylinderFerrule"]
+radius_top = 0.0042
+radius_bottom = 0.0042
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="MatShaft"]
+albedo_color = Color(0.45, 0.27, 0.12, 1)
+
+[node name="CueStick" type="Node3D"]
+script = ExtResource("1_cs")
+
+[node name="Shaft" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderShaft")
+material_override = SubResource("MatShaft")
+visible = false
+
+[node name="Ferrule" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderFerrule")
+visible = false
