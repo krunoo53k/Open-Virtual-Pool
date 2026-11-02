@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/rack/ball/ball.gd" id="1_ball"]
+
+[sub_resource type="SphereMesh" id="SphereBase"]
+radius = 1.0
+height = 2.0
+radial_segments = 32
+rings = 16
+
+[sub_resource type="CylinderMesh" id="StripeBand"]
+radius_top = 1.01
+radius_bottom = 1.01
+height = 1.2
+
+[node name="Ball" type="Node3D"]
+script = ExtResource("1_ball")
+
+[node name="Base" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereBase")
+
+[node name="Stripe" type="MeshInstance3D" parent="."]
+mesh = SubResource("StripeBand")

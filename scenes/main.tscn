@@ -1,15 +1,14 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
-[ext_resource type="PackedScene" path="res://scenes/version_stamp/version_stamp.tscn" id="1_stamp"]
+[ext_resource type="PackedScene" path="res://scenes/table/table.tscn" id="2_table"]
+[ext_resource type="PackedScene" path="res://scenes/rack/ball_rack/ball_rack.tscn" id="3_rack"]
+[ext_resource type="PackedScene" path="res://scenes/version_stamp/version_stamp.tscn" id="4_stamp"]
 
 [sub_resource type="ProceduralSky" id="Sky_1"]
 
 [sub_resource type="Environment" id="Env_1"]
 background_mode = 2
 background_sky = SubResource("Sky_1")
-
-[sub_resource type="PlaneMesh" id="Plane_1"]
-size = Vector2(2.44, 1.6)
 
 [node name="Main" type="Node3D"]
 
@@ -20,10 +19,11 @@ environment = SubResource("Env_1")
 transform = Transform3D(1, 0, 0, 0, 0.5, -0.866025, 0, 0.866025, 0.5, 0, 3, 0)
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 2.2)
+transform = Transform3D(1, 0, 0, 0, 0.6287, -0.7773, 0, 0.7773, 0.6287, 1.27, 1.9, 0.9)
 
-[node name="Bed" type="MeshInstance3D" parent="."]
-mesh = SubResource("Plane_1")
+[node name="Table" parent="." instance=ExtResource("2_table")]
 
-[node name="VersionStamp" parent="." instance=ExtResource("1_stamp")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="BallRack" parent="." instance=ExtResource("3_rack")]
+
+[node name="VersionStamp" parent="." instance=ExtResource("4_stamp")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 1.27, 0.9, -0.635)

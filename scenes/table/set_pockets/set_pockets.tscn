@@ -1,0 +1,60 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/table/pocket_mouth/pocket_mouth.tscn" id="1_pock"]
+[ext_resource type="PackedScene" path="res://scenes/table/jaw_face/jaw_face.tscn" id="2_jaw"]
+
+[node name="SetPockets" type="Node3D"]
+
+[node name="PocketBottomLeftCorner" parent="." instance=ExtResource("1_pock")]
+transform = Transform3D(0.0579120,0.0000000,0.0000000,0.0000000,0.1200000,0.0000000,0.0000000,0.0000000,0.0579120,0.0409500,-0.0600000,-0.0409500)
+
+[node name="JawBottomLeftCorner1" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(-0.3744607,0.0000000,0.2925608,0.0000000,0.0513000,0.0000000,-0.0123132,0.0000000,-0.0157602,-0.1053304,0.0256500,0.1462804)
+
+[node name="JawBottomLeftCorner2" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(-0.2925608,0.0000000,0.3744607,0.0000000,0.0513000,0.0000000,-0.0157602,0.0000000,-0.0123132,-0.1462804,0.0256500,0.1053304)
+
+[node name="PocketBottomRightCorner" parent="." instance=ExtResource("1_pock")]
+transform = Transform3D(0.0579120,0.0000000,0.0000000,0.0000000,0.1200000,0.0000000,0.0000000,0.0000000,0.0579120,2.4990500,-0.0600000,-0.0409500)
+
+[node name="JawBottomRightCorner1" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(0.3744607,0.0000000,0.2925608,0.0000000,0.0513000,0.0000000,-0.0123132,0.0000000,0.0157602,2.6453304,0.0256500,0.1462804)
+
+[node name="JawBottomRightCorner2" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(0.2925608,0.0000000,0.3744607,0.0000000,0.0513000,0.0000000,-0.0157602,0.0000000,0.0123132,2.6862804,0.0256500,0.1053304)
+
+[node name="PocketTopLeftCorner" parent="." instance=ExtResource("1_pock")]
+transform = Transform3D(0.0579120,0.0000000,0.0000000,0.0000000,0.1200000,0.0000000,0.0000000,0.0000000,0.0579120,0.0409500,-0.0600000,-1.2290500)
+
+[node name="JawTopLeftCorner1" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(-0.3744607,0.0000000,-0.2925608,0.0000000,0.0513000,0.0000000,0.0123132,0.0000000,-0.0157602,-0.1053304,0.0256500,-1.4162804)
+
+[node name="JawTopLeftCorner2" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(-0.2925608,0.0000000,-0.3744607,0.0000000,0.0513000,0.0000000,0.0157602,0.0000000,-0.0123132,-0.1462804,0.0256500,-1.3753304)
+
+[node name="PocketTopRightCorner" parent="." instance=ExtResource("1_pock")]
+transform = Transform3D(0.0579120,0.0000000,0.0000000,0.0000000,0.1200000,0.0000000,0.0000000,0.0000000,0.0579120,2.4990500,-0.0600000,-1.2290500)
+
+[node name="JawTopRightCorner1" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(0.3744607,0.0000000,-0.2925608,0.0000000,0.0513000,0.0000000,0.0123132,0.0000000,0.0157602,2.6453304,0.0256500,-1.4162804)
+
+[node name="JawTopRightCorner2" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(0.2925608,0.0000000,-0.3744607,0.0000000,0.0513000,0.0000000,0.0157602,0.0000000,0.0123132,2.6862804,0.0256500,-1.3753304)
+
+[node name="PocketBottomSide" parent="." instance=ExtResource("1_pock")]
+transform = Transform3D(0.0642620,0.0000000,0.0000000,0.0000000,0.1200000,0.0000000,0.0000000,0.0000000,0.0642620,1.2700000,-0.0600000,-0.0000000)
+
+[node name="JawBottomSide1" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(-0.0642620,0.0000000,0.2577408,0.0000000,0.0513000,0.0000000,-0.0194059,0.0000000,-0.0048384,1.3021310,0.0256500,0.1288704)
+
+[node name="JawBottomSide2" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(0.0642620,0.0000000,0.2577408,0.0000000,0.0513000,0.0000000,-0.0194059,0.0000000,0.0048384,1.2378690,0.0256500,0.1288704)
+
+[node name="PocketTopSide" parent="." instance=ExtResource("1_pock")]
+transform = Transform3D(0.0642620,0.0000000,0.0000000,0.0000000,0.1200000,0.0000000,0.0000000,0.0000000,0.0642620,1.2700000,-0.0600000,-1.2700000)
+
+[node name="JawTopSide1" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(0.0642620,0.0000000,-0.2577408,0.0000000,0.0513000,0.0000000,0.0194059,0.0000000,0.0048384,1.2378690,0.0256500,-1.3988704)
+
+[node name="JawTopSide2" parent="." instance=ExtResource("2_jaw")]
+transform = Transform3D(-0.0642620,0.0000000,-0.2577408,0.0000000,0.0513000,0.0000000,0.0194059,0.0000000,-0.0048384,1.3021310,0.0256500,-1.3988704)

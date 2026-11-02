@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="CylinderMesh" id="Cylinder_1"]
+radius_top = 1.0
+radius_bottom = 1.0
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Material_1"]
+albedo_color = Color(0.02, 0.02, 0.02, 1)
+cull_disabled = true
+
+[node name="PocketMouth" type="Node3D"]
+
+[node name="Hole" type="MeshInstance3D" parent="."]
+mesh = SubResource("Cylinder_1")
+material_override = SubResource("Material_1")

@@ -1,0 +1,35 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/table/set_rails/set_rails.tscn" id="1_set_rails"]
+[ext_resource type="PackedScene" path="res://scenes/table/set_cushions/set_cushions.tscn" id="2_set_cush"]
+[ext_resource type="PackedScene" path="res://scenes/table/set_pockets/set_pockets.tscn" id="3_set_pock"]
+
+[sub_resource type="StandardMaterial3D" id="ClothMat"]
+albedo_color = Color(0.05, 0.31, 0.24, 1)
+
+[sub_resource type="StandardMaterial3D" id="SlateMat"]
+albedo_color = Color(0.13, 0.13, 0.14, 1)
+
+[sub_resource type="BoxMesh" id="ClothBox"]
+size = Vector3(2.5400000, 0.02, 1.2700000)
+
+[sub_resource type="BoxMesh" id="SlateBox"]
+size = Vector3(2.6600000, 0.14, 1.3900000)
+
+[node name="Table" type="Node3D"]
+
+[node name="Cloth" parent="." type="MeshInstance3D"]
+transform = Transform3D(1.0000000,0.0000000,0.0000000,0.0000000,1.0000000,0.0000000,0.0000000,0.0000000,1.0000000,1.2700000,-0.0100000,-0.6350000)
+mesh = SubResource("ClothBox")
+material_override = SubResource("ClothMat")
+
+[node name="SlateFrame" parent="." type="MeshInstance3D"]
+transform = Transform3D(1.0000000,0.0000000,0.0000000,0.0000000,1.0000000,0.0000000,0.0000000,0.0000000,1.0000000,1.2700000,-0.0900000,-0.6350000)
+mesh = SubResource("SlateBox")
+material_override = SubResource("SlateMat")
+
+[node name="SetRails" parent="." instance=ExtResource("1_set_rails")]
+
+[node name="SetCushions" parent="." instance=ExtResource("2_set_cush")]
+
+[node name="SetPockets" parent="." instance=ExtResource("3_set_pock")]
