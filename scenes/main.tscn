@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/table/table.tscn" id="2_table"]
 [ext_resource type="PackedScene" path="res://scenes/rack/ball_rack/ball_rack.tscn" id="3_rack"]
 [ext_resource type="PackedScene" path="res://scenes/version_stamp/version_stamp.tscn" id="4_stamp"]
+[ext_resource type="PackedScene" path="res://scenes/input/human_shooter/human_shooter.tscn" id="5_shooter"]
 
 [sub_resource type="ProceduralSky" id="Sky_1"]
 
@@ -24,6 +25,8 @@ transform = Transform3D(1, 0, 0, 0, 0.6287, -0.7773, 0, 0.7773, 0.6287, 1.27, 1.
 [node name="Table" parent="." instance=ExtResource("2_table")]
 
 [node name="BallRack" parent="." instance=ExtResource("3_rack")]
+
+[node name="HumanShooter" parent="." instance=ExtResource("5_shooter")]
 
 [node name="VersionStamp" parent="." instance=ExtResource("4_stamp")]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 1.27, 0.9, -0.635)

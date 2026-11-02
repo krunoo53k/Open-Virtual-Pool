@@ -1,0 +1,18 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scenes/input/human_shooter/human_shooter.gd" id="1_shooter"]
+
+[ext_resource type="PackedScene" path="res://scenes/input/aim_input/aim_input.tscn" id="2_aim"]
+[ext_resource type="PackedScene" path="res://scenes/input/stroke_input/stroke_input.tscn" id="3_stroke"]
+[ext_resource type="PackedScene" path="res://scenes/input/english_input/english_input.tscn" id="4_english"]
+[ext_resource type="PackedScene" path="res://scenes/input/elevation_input/elevation_input.tscn" id="5_elev"]
+[ext_resource type="PackedScene" path="res://scenes/input/cancel_input/cancel_input.tscn" id="6_cancel"]
+
+[node name="HumanShooter" type="Node3D"]
+script = ExtResource("1_shooter")
+
+[node name="AimInput" parent="." instance=ExtResource("2_aim")]
+[node name="StrokeInput" parent="." instance=ExtResource("3_stroke")]
+[node name="EnglishInput" parent="." instance=ExtResource("4_english")]
+[node name="ElevationInput" parent="." instance=ExtResource("5_elev")]
+[node name="CancelInput" parent="." instance=ExtResource("6_cancel")]
