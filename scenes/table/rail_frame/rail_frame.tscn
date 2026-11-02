@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="BoxMesh" id="Box_1"]
+
+[sub_resource type="StandardMaterial3D" id="Material_1"]
+albedo_color = Color(0.32, 0.18, 0.1, 1)
+
+[node name="RailFrame" type="Node3D"]
+
+[node name="Wood" type="MeshInstance3D" parent="."]
+mesh = SubResource("Box_1")
+material_override = SubResource("Material_1")
