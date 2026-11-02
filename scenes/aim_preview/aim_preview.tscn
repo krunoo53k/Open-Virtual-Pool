@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scenes/aim_preview/aim_preview.gd" id="1_ap"]
+
+[sub_resource type="CylinderMesh" id="CylinderSlim"]
+radius_top = 0.0022
+radius_bottom = 0.0022
+height = 1.0
+
+[sub_resource type="SphereMesh" id="SphereGhost"]
+radius = 0.028575
+height = 0.05715
+radial_segments = 24
+rings = 16
+
+[sub_resource type="StandardMaterial3D" id="MatGhost"]
+albedo_color = Color(0.9, 0.95, 1, 0.35)
+blend_mode = 1
+
+[sub_resource type="SphereMesh" id="SphereMark"]
+radius = 0.008
+height = 0.016
+
+[node name="AimPreview" type="Node3D"]
+script = ExtResource("1_ap")
+
+[node name="GhostLine" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderSlim")
+visible = false
+
+[node name="LeaveArrow" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderSlim")
+visible = false
+
+[node name="GhostBall" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereGhost")
+material_override = SubResource("MatGhost")
+visible = false
+
+[node name="HitMarker" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMark")
+visible = false
