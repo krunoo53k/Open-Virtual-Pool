@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/input/stroke_input/stroke_input.gd" id="1_strokeinput"]
+
+[node name="StrokeInput" type="Node3D"]
+script = ExtResource("1_strokeinput")
