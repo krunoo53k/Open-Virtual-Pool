@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://tools/shot_playback_test.gd" id="1_spt"]
+[ext_resource type="PackedScene" path="res://scenes/pool_simulation.tscn" id="2_ps"]
+[ext_resource type="PackedScene" path="res://scenes/shot_playback/shot_playback.tscn" id="3_sp"]
+
+[node name="ShotPlaybackTest" type="Node3D"]
+script = ExtResource("1_spt")
+
+[node name="PoolSimulation" parent="." instance=ExtResource("2_ps")]
+
+[node name="ShotPlayback" parent="." instance=ExtResource("3_sp")]
+
+[connection signal="path_finished" from="ShotPlayback" to="." method="_on_path_finished"]
