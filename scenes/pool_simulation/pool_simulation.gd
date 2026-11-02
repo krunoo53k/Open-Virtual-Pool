@@ -74,3 +74,12 @@ func preview_of(params: ShotParams) -> ShotPreview:
 	# a raised butt points down at the ball: negative here (§12.3's sign).
 	preview.elevation_deg = float(seen["elevation_deg"])
 	return preview
+
+
+## Where the cue ball would first touch along the stretch, and where the
+## aim line ends: the display ray's answer, typed. The one place a ray
+## test sits stays behind the adapter's door: views display this and never
+## derive it.
+func ghost_of(params: ShotParams, rack: RackState) -> ShotGhost:
+	var preview := preview_of(params)
+	return DisplayRay.stretch_of(rack, preview, layout)
