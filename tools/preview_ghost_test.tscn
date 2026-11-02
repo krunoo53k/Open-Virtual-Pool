@@ -1,0 +1,12 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://tools/preview_ghost_test.gd" id="1_pgt"]
+[ext_resource type="PackedScene" path="res://scenes/pool_simulation.tscn" id="2_ps"]
+[ext_resource type="PackedScene" path="res://scenes/aim_preview/aim_preview.tscn" id="3_ap"]
+
+[node name="PreviewGhostTest" type="Node3D"]
+script = ExtResource("1_pgt")
+
+[node name="PoolSimulation" parent="." instance=ExtResource("2_ps")]
+
+[node name="AimPreview" parent="." instance=ExtResource("3_ap")]
