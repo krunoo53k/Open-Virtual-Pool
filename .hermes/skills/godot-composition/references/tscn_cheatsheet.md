@@ -39,7 +39,7 @@ Notes:
 @export var simulation: PoolSimulation # a node in the same scene tree
 ```
 
-Use these for things the scene needs. If the composer wires them in `_ready()`, add `assert(tuning != null, "CueInput needs a CueTuning")` at the top of the scene's `_ready()` so a missing dependency fails loudly.
+A node class in an annotation resolves only when the script that node runs declares that `class_name`, so the class belongs on the script the annotation names even when that script lives under `scenes/`; without it the consumer fails to parse at load time and the node runs with no script attached. The alternative is to drop the annotation to the base type and assert the dependency in `_ready()`. A `Resource` class is the easy case. Use these for things the scene needs. If the composer wires them in `_ready()`, add `assert(tuning != null, "CueInput needs a CueTuning")` at the top of the scene's `_ready()` so a missing dependency fails loudly.
 
 ## Resource class
 
