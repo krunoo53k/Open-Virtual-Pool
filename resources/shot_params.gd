@@ -15,3 +15,4 @@ class_name ShotParams extends Resource
 @export var elevation_deg := 0.0  # deg: how much the cue is raised at the butt.
 @export var contact_x := 0.0  # m: where the tip meets the cue ball, to the shooter's right.
 @export var contact_y := 0.0  # m: where the tip meets the cue ball, above the centre.
+@export var called_pocket := -1  # pocket index (core order 0-5) called for the 8 stroke; -1 means no call. BCA calls only the 8, so this is the only call the rules read.

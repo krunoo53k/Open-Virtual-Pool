@@ -1,0 +1,545 @@
+{
+  "_schema": {
+    "fixtures": "list of fixture scenarios",
+    "name": "fixture label",
+    "shots": "ordered shots; the runner folds each ruling into a MatchState",
+    "params": "ShotParams fields (nulls use defaults); called_pocket: -1 = no call, else core pocket index 0-5 (corners first, then sides)",
+    "outcome": "ShotOutcome fields: outcome_of (solved|settling|unsimulated|error), phase_reached (still balls|settle|settling|jumped|hit|model state), miscue, foul (advisory only)",
+    "events": "ShotEvent list in shot order: kind is the core word (ball-ball|cushion|jaw|slate|state|pocket-enter|pocket-drop|pocket-exit|off-table); ball = ball number (cue 0); other = other ball number / rail index / core pocket index (-1 unused); detail = core detail word count, 0 here; time = shot-clock seconds",
+    "expect": "Judgement fields the rules must return + signals list: 'name:payload' in announce order (foul_committed before groups_assigned/ball_in_hand_granted; game_over replaces turn_changed)"
+  },
+  "fixtures": [
+    {
+      "name": "legal break, then open-table pot sets the group",
+      "notes": ["break: contact 1, driven {3,5,7,9} >= 4, no pot, no scratch: legal; no object pot means the turn passes to the challenger"],
+      "shots": [
+        {
+          "name": "break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8},
+            {"kind": "pocket-enter", "ball": 11, "other": 0, "detail": 0, "time": 1.0},
+            {"kind": "pocket-exit", "ball": 11, "other": 0, "detail": 0, "time": 1.2}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "open table legal pot sets shooter group",
+          "params": {"speed": 8.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 4, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 4, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 4, "other": 0, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 2, "game_over": false, "winner": 0, "signals": ["groups_assigned:2", "turn_changed:2"]}
+        }
+      ]
+    },
+    {
+      "name": "open-table foul chain: eight first, no rail, hit nothing",
+      "notes": ["open table: hitting the 8 first is a wrong-group foul", "no_rail_after_contact: rail at t<contact and no pot", "no_contact: only the cue cushioned", "every foul grants ball-in-hand to the next shooter and passes the turn"],
+      "shots": [
+        {
+          "name": "legal break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "eight first on an open table fouls",
+          "params": {"speed": 8.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 8, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 8, "other": 1, "detail": 0, "time": 0.6}
+          ],
+          "expect": {"foul_reason": "wrong_group_first_contact", "next_player": 1, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:wrong_group_first_contact", "ball_in_hand_granted:1", "turn_changed:1"]}
+        },
+        {
+          "name": "rail before contact, no pot: no-rail foul",
+          "params": {"speed": 6.0, "level_aim_deg": 92.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "cushion", "ball": 3, "other": 1, "detail": 0, "time": 0.2},
+            {"kind": "ball-ball", "ball": 0, "other": 4, "detail": 0, "time": 0.4},
+            {"kind": "pocket-enter", "ball": 11, "other": 0, "detail": 0, "time": 1.0},
+            {"kind": "pocket-exit", "ball": 11, "other": 0, "detail": 0, "time": 1.3}
+          ],
+          "expect": {"foul_reason": "no_rail_after_contact", "next_player": 2, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:no_rail_after_contact", "ball_in_hand_granted:2", "turn_changed:2"]}
+        },
+        {
+          "name": "no ball-ball event at all: no-contact foul",
+          "params": {"speed": 9.0, "level_aim_deg": 60.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "cushion", "ball": 0, "other": 3, "detail": 0, "time": 0.5},
+            {"kind": "pocket-enter", "ball": 11, "other": 0, "detail": 0, "time": 1.0},
+            {"kind": "pocket-exit", "ball": 11, "other": 0, "detail": 0, "time": 1.2}
+          ],
+          "expect": {"foul_reason": "no_contact", "next_player": 1, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:no_contact", "ball_in_hand_granted:1", "turn_changed:1"]}
+        }
+      ]
+    },
+    {
+      "name": "assigned table: wrong-group first contact fouls",
+      "notes": ["P2 pots 11 on the open table: P2 takes stripes, so the ruling names P1 as the solids player"],
+      "shots": [
+        {
+          "name": "legal break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "open pot of 11 sets stripes for P2",
+          "params": {"speed": 8.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 11, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 11, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 11, "other": 2, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 1, "game_over": false, "winner": 0, "signals": ["groups_assigned:1", "turn_changed:2"]}
+        },
+        {
+          "name": "P2 is stripes but a solid comes first",
+          "params": {"speed": 7.0, "level_aim_deg": 88.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 5, "detail": 0, "time": 0.4},
+            {"kind": "cushion", "ball": 5, "other": 1, "detail": 0, "time": 0.7}
+          ],
+          "expect": {"foul_reason": "wrong_group_first_contact", "next_player": 1, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:wrong_group_first_contact", "ball_in_hand_granted:1", "turn_changed:1"]}
+        }
+      ]
+    },
+    {
+      "name": "no-rail after contact on an assigned table",
+      "shots": [
+        {
+          "name": "legal break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "open pot of 1 sets solids for P2",
+          "params": {"speed": 8.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 1, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 1, "other": 2, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 2, "game_over": false, "winner": 0, "signals": ["groups_assigned:2", "turn_changed:2"]}
+        },
+        {
+          "name": "own group hit first but only a pre-contact rail",
+          "params": {"speed": 8.0, "level_aim_deg": 95.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "cushion", "ball": 3, "other": 1, "detail": 0, "time": 0.2},
+            {"kind": "ball-ball", "ball": 0, "other": 2, "detail": 0, "time": 0.4},
+            {"kind": "pocket-enter", "ball": 9, "other": 0, "detail": 0, "time": 1.0},
+            {"kind": "pocket-exit", "ball": 9, "other": 0, "detail": 0, "time": 1.3}
+          ],
+          "expect": {"foul_reason": "no_rail_after_contact", "next_player": 1, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:no_rail_after_contact", "ball_in_hand_granted:1", "turn_changed:1"]}
+        }
+      ]
+    },
+    {
+      "name": "scratch grants ball-in-hand, then a clean own pot keeps",
+      "shots": [
+        {
+          "name": "legal break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "open pot of 9 sets stripes for P2",
+          "params": {"speed": 8.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 9, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 9, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 9, "other": 1, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 1, "game_over": false, "winner": 0, "signals": ["groups_assigned:1", "turn_changed:2"]}
+        },
+        {
+          "name": "cue drop after a legal hit: scratch",
+          "params": {"speed": 9.0, "level_aim_deg": 100.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 10, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 10, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 0, "other": 1, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "scratch", "next_player": 1, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:scratch", "ball_in_hand_granted:1", "turn_changed:1"]}
+        },
+        {
+          "name": "clean own-group pot after the grant keeps the turn",
+          "params": {"speed": 8.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 3, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 3, "other": 0, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 1, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:1"]}
+        }
+      ]
+    },
+    {
+      "name": "called eight into the called pocket wins",
+      "shots": [
+        {
+          "name": "legal break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "open pot of 9 sets stripes for P2, solids for P1",
+          "params": {"speed": 8.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 9, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 9, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 9, "other": 1, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 1, "game_over": false, "winner": 0, "signals": ["groups_assigned:1", "turn_changed:2"]}
+        },
+        {
+          "name": "P2 clears the rest of the stripes",
+          "params": {"speed": 10.0, "level_aim_deg": 120.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 11, "detail": 0, "time": 0.3},
+            {"kind": "pocket-drop", "ball": 11, "other": 2, "detail": 0, "time": 0.9},
+            {"kind": "pocket-drop", "ball": 12, "other": 2, "detail": 0, "time": 1.1},
+            {"kind": "pocket-drop", "ball": 13, "other": 2, "detail": 0, "time": 1.3},
+            {"kind": "pocket-drop", "ball": 14, "other": 2, "detail": 0, "time": 1.5},
+            {"kind": "pocket-drop", "ball": 15, "other": 2, "detail": 0, "time": 1.7},
+            {"kind": "pocket-drop", "ball": 10, "other": 2, "detail": 0, "time": 1.9}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "P2 on the eight: rail hit, no pot, turn passes",
+          "params": {"speed": 7.0, "level_aim_deg": 80.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 8, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 8, "other": 1, "detail": 0, "time": 0.7}
+          ],
+          "expect": {"foul_reason": "", "next_player": 1, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:1"]}
+        },
+        {
+          "name": "P1 pots the first half of the solids",
+          "params": {"speed": 10.0, "level_aim_deg": 110.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "pocket-drop", "ball": 1, "other": 0, "detail": 0, "time": 0.9},
+            {"kind": "pocket-drop", "ball": 3, "other": 0, "detail": 0, "time": 1.1},
+            {"kind": "pocket-drop", "ball": 5, "other": 2, "detail": 0, "time": 1.3}
+          ],
+          "expect": {"foul_reason": "", "next_player": 1, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:1"]}
+        },
+        {
+          "name": "P1 pots the rest of the solids",
+          "params": {"speed": 6.0, "level_aim_deg": 70.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 2, "detail": 0, "time": 0.3},
+            {"kind": "pocket-drop", "ball": 2, "other": 1, "detail": 0, "time": 0.9},
+            {"kind": "pocket-drop", "ball": 4, "other": 3, "detail": 0, "time": 1.1},
+            {"kind": "pocket-drop", "ball": 6, "other": 4, "detail": 0, "time": 1.3}
+          ],
+          "expect": {"foul_reason": "", "next_player": 1, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:1"]}
+        },
+        {
+          "name": "P1 clears the last solids then calls",
+          "params": {"speed": 9.0, "level_aim_deg": 100.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 7, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 7, "other": 0, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 1, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:1"]}
+        },
+        {
+          "name": "called eight into the called pocket: P1 wins",
+          "params": {"speed": 7.0, "level_aim_deg": 134.0, "called_pocket": 0},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 8, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 8, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 8, "other": 0, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 0, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": true, "winner": 1, "signals": ["game_over:1"]}
+        }
+      ]
+    },
+    {
+      "name": "uncalled eight pot is a loss",
+      "shots": [
+        {
+          "name": "legal break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "open pot of 9 sets stripes for P2, solids for P1",
+          "params": {"speed": 8.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 9, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 9, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 9, "other": 1, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 1, "game_over": false, "winner": 0, "signals": ["groups_assigned:1", "turn_changed:2"]}
+        },
+        {
+          "name": "P2 clears the rest of the stripes",
+          "params": {"speed": 10.0, "level_aim_deg": 120.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 11, "detail": 0, "time": 0.3},
+            {"kind": "pocket-drop", "ball": 11, "other": 2, "detail": 0, "time": 0.9},
+            {"kind": "pocket-drop", "ball": 12, "other": 2, "detail": 0, "time": 1.1},
+            {"kind": "pocket-drop", "ball": 13, "other": 2, "detail": 0, "time": 1.3},
+            {"kind": "pocket-drop", "ball": 14, "other": 2, "detail": 0, "time": 1.5},
+            {"kind": "pocket-drop", "ball": 15, "other": 2, "detail": 0, "time": 1.7},
+            {"kind": "pocket-drop", "ball": 10, "other": 2, "detail": 0, "time": 1.9}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "P2 on the eight: rail hit, no pot, turn passes",
+          "params": {"speed": 7.0, "level_aim_deg": 80.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 8, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 8, "other": 1, "detail": 0, "time": 0.7}
+          ],
+          "expect": {"foul_reason": "", "next_player": 1, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:1"]}
+        },
+        {
+          "name": "P1 still has solids and pots the 8 uncalled",
+          "params": {"speed": 8.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 8, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 8, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 8, "other": 0, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "wrong_group_first_contact", "next_player": 0, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": true, "winner": 2, "signals": ["foul_committed:wrong_group_first_contact", "game_over:2"]}
+        }
+      ]
+    },
+    {
+      "name": "called eight into the wrong pocket loses",
+      "shots": [
+        {
+          "name": "legal break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "open pot of 9 sets stripes for P2, solids for P1",
+          "params": {"speed": 8.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 9, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 9, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 9, "other": 1, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 1, "game_over": false, "winner": 0, "signals": ["groups_assigned:1", "turn_changed:2"]}
+        },
+        {
+          "name": "P2 clears the rest of the stripes",
+          "params": {"speed": 10.0, "level_aim_deg": 120.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 11, "detail": 0, "time": 0.3},
+            {"kind": "pocket-drop", "ball": 11, "other": 2, "detail": 0, "time": 0.9},
+            {"kind": "pocket-drop", "ball": 12, "other": 2, "detail": 0, "time": 1.1},
+            {"kind": "pocket-drop", "ball": 13, "other": 2, "detail": 0, "time": 1.3},
+            {"kind": "pocket-drop", "ball": 14, "other": 2, "detail": 0, "time": 1.5},
+            {"kind": "pocket-drop", "ball": 15, "other": 2, "detail": 0, "time": 1.7},
+            {"kind": "pocket-drop", "ball": 10, "other": 2, "detail": 0, "time": 1.9}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "P2 on the eight: rail hit, no pot, turn passes",
+          "params": {"speed": 7.0, "level_aim_deg": 80.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 8, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 8, "other": 1, "detail": 0, "time": 0.7}
+          ],
+          "expect": {"foul_reason": "", "next_player": 1, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:1"]}
+        },
+        {
+          "name": "P1 pots most solids and calls the corner",
+          "params": {"speed": 10.0, "level_aim_deg": 110.0, "called_pocket": 0},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "pocket-drop", "ball": 1, "other": 0, "detail": 0, "time": 0.9},
+            {"kind": "pocket-drop", "ball": 3, "other": 0, "detail": 0, "time": 1.1},
+            {"kind": "pocket-drop", "ball": 5, "other": 2, "detail": 0, "time": 1.3}
+          ],
+          "expect": {"foul_reason": "", "next_player": 1, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:1"]}
+        },
+        {
+          "name": "P1 clears the last solids",
+          "params": {"speed": 9.0, "level_aim_deg": 100.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 2, "detail": 0, "time": 0.3},
+            {"kind": "pocket-drop", "ball": 2, "other": 1, "detail": 0, "time": 0.9},
+            {"kind": "pocket-drop", "ball": 4, "other": 3, "detail": 0, "time": 1.1},
+            {"kind": "pocket-drop", "ball": 6, "other": 4, "detail": 0, "time": 1.3},
+            {"kind": "pocket-drop", "ball": 7, "other": 2, "detail": 0, "time": 1.5}
+          ],
+          "expect": {"foul_reason": "", "next_player": 1, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:1"]}
+        },
+        {
+          "name": "called the corner, the 8 drops in the side: P2 wins",
+          "params": {"speed": 7.0, "level_aim_deg": 134.0, "called_pocket": 0},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 8, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 8, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 8, "other": 3, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 0, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": true, "winner": 2, "signals": ["game_over:2"]}
+        }
+      ]
+    },
+    {
+      "name": "eight on the break re-racks with the shooter to break",
+      "shots": [
+        {
+          "name": "legal break pots the 8",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8},
+            {"kind": "pocket-drop", "ball": 8, "other": 0, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 1, "ball_in_hand": false, "re_rack": true, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:1"]}
+        },
+        {
+          "name": "breaker re-breaks legally, no pots",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 2, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 4, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 6, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 10, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        }
+      ]
+    },
+    {
+      "name": "object ball off the table fouls with grant",
+      "shots": [
+        {
+          "name": "legal break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "P2 legal open hit then a ball leaves the table",
+          "params": {"speed": 12.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 9, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 9, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "off-table", "ball": 5, "other": -1, "detail": 2, "time": 1.2}
+          ],
+          "expect": {"foul_reason": "ball_off_table", "next_player": 1, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:ball_off_table", "ball_in_hand_granted:1", "turn_changed:1"]}
+        }
+      ]
+    }
+  ]
+}
