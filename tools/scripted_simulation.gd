@@ -11,11 +11,11 @@ var _events: Array[ShotEvent] = []
 
 func script_next(outcome: ShotOutcome, events: Array[ShotEvent]) -> void:
 	# Keep the outcome honest against its own events, as the real outcome_of
-	# does: the composer folds pocketed and off-table lists from the outcome.
+	# does: a scratched cue is ball 0 in pocketed, and RackModel respots it.
 	for event in events:
-		if event.kind == "pocket-drop" and event.ball != 0:
+		if event.kind == "pocket-drop":
 			outcome.pocketed.append(event.ball)
-		elif event.kind == "off-table" and event.ball != 0:
+		elif event.kind == "off-table":
 			outcome.off_table.append(event.ball)
 	_outcome = outcome
 	_events = events

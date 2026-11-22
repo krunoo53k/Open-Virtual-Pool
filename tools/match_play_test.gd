@@ -1,5 +1,7 @@
 extends Node3D
 
+# lint-ignore-file: script-too-long (one harness drives a full game and asserts the scratch rack hand-off)
+
 ## Headless acceptance for #7. Drives the match's real public take_shot entry
 ## through a full legal game - break, open-table group, scratch and ball-in-hand,
 ## a called 8 - and asserts turn alternation, the six phases and the winner.
@@ -19,6 +21,8 @@ func _ready() -> void:
 	$Match/TurnFlow.phase_entered.connect(_on_phase)
 	$Match/ShotPlayback.time_scale = 1000.0  # finish each replay in one frame
 	await _run_game()
+	print("match play-test: ", _fails, " failed assertions; winner ", _winner)
+	get_tree().quit(_fails)
 
 
 func _run_game() -> void:
@@ -51,11 +55,20 @@ func _run_game() -> void:
 	_check(game.get_current_player() == 2, "an own-group pot keeps the turn")
 
 	# 3. a scratch grants ball-in-hand to the incoming player
+	var rack_before_scratch: int = game.rack.numbers.size()
 	_script(true, [_ev("pocket-drop", 0, 0, 0.9)])
 	await _play(-1)
 	_check(game.get_current_player() == 1, "a scratch passes the turn")
 	_check(game.get_state().ball_in_hand, "a scratch grants ball-in-hand")
 	_check(_phases.has("BallInHand"), "the BallInHand phase was entered")
+	# the cue is respotted, not dropped from the rack (the core reports it in
+	# outcome.pocketed on a scratch, so after_shot has to keep number 0)
+	_check(game.rack.numbers.has(0) and game.rack.numbers.size() == rack_before_scratch,
+		"a scratch keeps the cue in the rack")
+	var cue: int = game.rack.numbers.find(0)
+	var spot := RackModel.head_spot(game.get_node("Simulation").layout)
+	_check(cue >= 0 and game.rack.positions[cue].distance_to(spot) < 0.0001,
+		"ball-in-hand respots the cue at the head spot")
 	await _finish_game()
 
 
@@ -80,8 +93,6 @@ func _finish_game() -> void:
 	for phase in ["AwaitingShot", "Striking", "Rolling", "Judging", "BallInHand", "GameOver"]:
 		_check(_phases.has(phase), "phase entered: " + phase)
 	_check(_turns == [2, 2, 1, 1, 1], "turn alternation: " + str(_turns))
-	print("match play-test: ", _fails, " failed assertions; winner ", _winner)
-	get_tree().quit(_fails)
 
 
 func _ev(kind: String, ball: int, other: int, time: float) -> ShotEvent:
