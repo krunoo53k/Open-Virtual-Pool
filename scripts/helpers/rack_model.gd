@@ -3,7 +3,9 @@ extends RefCounted
 
 ## The composer's rack bookkeeping. A RackState stays index-aligned with the
 ## core's final frame: positions, numbers and rotations move together, and a
-## potted or off-table ball leaves all three. No scene here simulates anything.
+## potted or off-table ball leaves all three. The cue is the exception: a
+## scratch still leaves it in the rack, back at its pre-shot spot and clear of
+## spin, so ball-in-hand has a ball to move. No scene here simulates anything.
 
 static func after_shot(shot: PoolShot, removed: Array[int], rack: RackState) -> void:
 	var final: Dictionary = shot.get_final_state()
@@ -12,6 +14,10 @@ static func after_shot(shot: PoolShot, removed: Array[int], rack: RackState) -> 
 	var positions := PackedVector3Array()
 	var numbers := PackedInt32Array()
 	var rotations := PackedVector3Array()
+	if removed.has(0):
+		numbers.append(0)
+		positions.append(_cue_spot(rack))
+		rotations.append(Vector3.ZERO)
 	for i in balls.size():
 		var ball: Dictionary = balls[i]
 		var number := int(ball["number"])
@@ -23,6 +29,14 @@ static func after_shot(shot: PoolShot, removed: Array[int], rack: RackState) -> 
 	rack.numbers = numbers
 	rack.positions = positions
 	rack.rotations = rotations
+
+
+## Where the cue sat before the shot: ball-in-hand hands that spot back.
+static func _cue_spot(rack: RackState) -> Vector3:
+	for i in rack.numbers.size():
+		if int(rack.numbers[i]) == 0 and i < rack.positions.size():
+			return rack.positions[i]
+	return Vector3.ZERO
 
 
 static func head_spot(layout: TableLayout) -> Vector3:

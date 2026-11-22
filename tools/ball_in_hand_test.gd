@@ -22,25 +22,22 @@ func _run() -> void:
 	var input := $Match/BallInHandInput
 	var layout: TableLayout = $Match/Simulation.layout
 	_check(not input.is_active(), "input idle before the foul")
-	var opening: Array[ShotEvent] = [_ev("ball-ball", 0, 1, 0.3)]
-	for n in [3, 5, 7, 9]:
-		opening.append(_ev("cushion", n, 2, 0.5))
-	_script(false, opening)
-	$Match.take_shot(ShotParams.new())
-	await _settle()
+	await _break()
 	_check(not input.is_active(), "input idle after the break")
 	_check(game.get_current_player() == 2, "break passes the turn")
-	_script(true, [_ev("pocket-drop", 0, 0, 0.9)])
+	_scratch()
 	$Match.take_shot(ShotParams.new())
 	await _settle()
 	_check(game.get_phase() == "BallInHand", "scratch grants ball-in-hand")
 	_check(input.is_active(), "input live only in BallInHand")
 	_check(_active_by_phase.has("BallInHand:true"), "phase entry enabled input")
 	_check(_active_by_phase.has("AwaitingShot:false"), "other phases keep it idle")
+	_check(game.rack.numbers[0] == 0, "cue survives the scratch at index 0")
 
 	var before := PackedVector3Array(game.rack.positions)
 	var ball := $Match/BallRack.get_child(0) as Ball
 	var visible_before := ball.position
+	var other_before: Vector3 = game.rack.positions[1]
 	var cluster: Vector3 = game.rack.positions[1]
 	_check(not input.place_at(cluster), "cluster spot rejected")
 	_check(_emits == 0, "rejection emits no placement")
@@ -53,12 +50,31 @@ func _run() -> void:
 	_check(input.place_at(spot), "clean spot accepted")
 	_check(_emits == 1, "placement emitted once")
 	_check(game.rack.positions[0].distance_to(spot) < 0.0001, "model cue moved")
+	_check(game.rack.positions[1].distance_to(other_before) < 0.0001, "ball 1 untouched by placement")
 	_check(ball.position.distance_to(spot) < 0.0001, "visible cue moved")
 	_check(not input.is_active(), "input deactivated after placement")
 	_check(game.get_phase() == "AwaitingShot", "flow resumes")
 	_check(game.get_current_player() == 1, "incoming player shoots")
 	print("ball-in-hand: ", _fails, " failed assertions")
 	get_tree().quit(_fails)
+
+
+func _break() -> void:
+	var opening: Array[ShotEvent] = [_ev("ball-ball", 0, 1, 0.3)]
+	for n in [3, 5, 7, 9]:
+		opening.append(_ev("cushion", n, 2, 0.5))
+	_script(false, opening)
+	$Match.take_shot(ShotParams.new())
+	await _settle()
+
+
+func _scratch() -> void:
+	# A real scratched shot carries ball 0 in pocketed; the tools double only
+	# appends non-cue pots, so hand the ruling an outcome that has the cue too.
+	var outcome := _outcome(true)
+	outcome.pocketed.append(0)
+	var events: Array[ShotEvent] = [_ev("pocket-drop", 0, 0, 0.9)]
+	$Match/Simulation.script_next(outcome, events)
 
 
 func _settle() -> void:
