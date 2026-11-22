@@ -31,7 +31,7 @@ func _ready() -> void:
 	_stroke_leaf = cue.get_stroke_leaf()
 	_english_leaf = cue.get_english_leaf()
 	_elevation_leaf = cue.get_elevation_leaf()
-	cue.shot_prepared.connect(_capture_shot)
+	cue.shot_committed.connect(_capture_shot)
 	await _the_turn_turns_the_line()
 	await _the_fine_trim_holds_the_same_turn_back()
 	await _the_aim_never_drifts_once_settled()

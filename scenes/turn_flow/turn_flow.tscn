@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/turn_flow/turn_flow.gd" id="1_flow"]
+[ext_resource type="Script" path="res://scenes/turn_flow/turn_state.gd" id="2_state"]
+
+[node name="TurnFlow" type="Node"]
+script = ExtResource("1_flow")
+
+[node name="AwaitingShot" type="Node" parent="."]
+script = ExtResource("2_state")
+phase = "AwaitingShot"
+
+[node name="Striking" type="Node" parent="."]
+script = ExtResource("2_state")
+phase = "Striking"
+
+[node name="Rolling" type="Node" parent="."]
+script = ExtResource("2_state")
+phase = "Rolling"
+
+[node name="Judging" type="Node" parent="."]
+script = ExtResource("2_state")
+phase = "Judging"
+
+[node name="BallInHand" type="Node" parent="."]
+script = ExtResource("2_state")
+phase = "BallInHand"
+
+[node name="GameOver" type="Node" parent="."]
+script = ExtResource("2_state")
+phase = "GameOver"

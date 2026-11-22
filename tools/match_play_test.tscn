@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://tools/match_play_test.gd" id="1_test"]
+[ext_resource type="PackedScene" path="res://tools/scripted_simulation.tscn" id="2_sim"]
+[ext_resource type="PackedScene" path="res://scenes/match/match.tscn" id="3_match"]
+
+[node name="MatchPlayTest" type="Node3D"]
+script = ExtResource("1_test")
+
+[node name="Match" parent="." instance=ExtResource("3_match")]
+simulation_scene = ExtResource("2_sim")
