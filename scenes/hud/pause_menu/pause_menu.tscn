@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/hud/pause_menu/pause_menu.gd" id="1_pause"]
+
+[node name="PauseMenu" type="PanelContainer"]
+visible = false
+script = ExtResource("1_pause")
+
+[node name="Choices" type="VBoxContainer" parent="."]
+
+[node name="Resume" type="Button" parent="Choices"]
+text = "Resume"
+
+[node name="Restart" type="Button" parent="Choices"]
+text = "Restart"
+
+[node name="BackToMenu" type="Button" parent="Choices"]
+text = "Back to menu"
+
+[connection signal="pressed" from="Choices/Resume" to="." method="_on_resume_pressed"]
+[connection signal="pressed" from="Choices/Restart" to="." method="_on_restart_pressed"]
+[connection signal="pressed" from="Choices/BackToMenu" to="." method="_on_menu_pressed"]

@@ -1,0 +1,29 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scenes/hud/hud.gd" id="1_hud"]
+[ext_resource type="PackedScene" path="res://scenes/hud/turn_status/turn_status.tscn" id="2_turn"]
+[ext_resource type="PackedScene" path="res://scenes/hud/foul_banner/foul_banner.tscn" id="3_foul"]
+[ext_resource type="PackedScene" path="res://scenes/hud/result_banner/result_banner.tscn" id="4_result"]
+[ext_resource type="PackedScene" path="res://scenes/hud/called_pocket_picker/called_pocket_picker.tscn" id="5_picker"]
+[ext_resource type="PackedScene" path="res://scenes/hud/pause_menu/pause_menu.tscn" id="6_pause"]
+[ext_resource type="PackedScene" path="res://scenes/version_stamp/version_stamp.tscn" id="7_version"]
+
+[node name="Hud" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="TurnStatus" parent="." instance=ExtResource("2_turn")]
+
+[node name="FoulBanner" parent="." instance=ExtResource("3_foul")]
+
+[node name="ResultBanner" parent="." instance=ExtResource("4_result")]
+
+[node name="CalledPocketPicker" parent="." instance=ExtResource("5_picker")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("6_pause")]
+
+[node name="VersionStamp" parent="." instance=ExtResource("7_version")]
+
+[connection signal="pocket_called" from="CalledPocketPicker" to="." method="_on_pocket_called"]
+[connection signal="resume_requested" from="PauseMenu" to="." method="_on_resume_requested"]
+[connection signal="restart_requested" from="PauseMenu" to="." method="_on_restart_requested"]
+[connection signal="menu_requested" from="PauseMenu" to="." method="_on_menu_requested"]
