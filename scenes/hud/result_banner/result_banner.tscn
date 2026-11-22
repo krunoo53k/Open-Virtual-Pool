@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/hud/result_banner/result_banner.gd" id="1_result"]
+
+[node name="ResultBanner" type="PanelContainer"]
+visible = false
+script = ExtResource("1_result")
+
+[node name="WinnerLabel" type="Label" parent="."]
+text = ""

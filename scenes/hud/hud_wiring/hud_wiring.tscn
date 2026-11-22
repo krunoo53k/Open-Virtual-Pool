@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/hud/hud_wiring/hud_wiring.gd" id="1_wiring"]
+[ext_resource type="PackedScene" path="res://scenes/input/cancel_input/cancel_input.tscn" id="2_cancel"]
+
+[node name="HudWiring" type="Node"]
+script = ExtResource("1_wiring")
+
+[node name="CancelInput" parent="." instance=ExtResource("2_cancel")]
+process_mode = 3

@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/hud/foul_banner/foul_banner.gd" id="1_foul"]
+
+[node name="FoulBanner" type="PanelContainer"]
+visible = false
+script = ExtResource("1_foul")
+
+[node name="Row" type="HBoxContainer" parent="."]
+
+[node name="Caption" type="Label" parent="Row"]
+text = "FOUL"
+
+[node name="ReasonLabel" type="Label" parent="Row"]
+text = ""
