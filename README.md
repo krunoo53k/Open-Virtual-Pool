@@ -16,7 +16,7 @@ cd ../Virtual-Pool-Physics-Engine
 ./godot-project/build-extension.sh release
 cp godot-project/bin/libpool_godot.so ../Open-Virtual-Pool/bin/
 
-# from this repo: open the main scene
+# from this repo: boots the menu (the configured main scene)
 godot --path . # (editor, 4.7)
 ```
 
@@ -32,8 +32,9 @@ any running screen, so the loaded extension can be identified while playing.
 
 ## Run the menu
 
-`scenes/main_menu/main_menu.tscn` stands alone; a boot splash gives way to the
-title screen:
+`scenes/main_menu/main_menu.tscn` is the configured main scene: plain
+`godot --path .` shows a boot splash and then the title screen. It also stands
+alone if you want to launch it explicitly:
 
 ```sh
 godot --path . res://scenes/main_menu/main_menu.tscn
