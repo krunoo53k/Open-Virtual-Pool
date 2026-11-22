@@ -3,8 +3,8 @@
 [ext_resource type="Script" path="res://scenes/aim_preview/aim_preview.gd" id="1_ap"]
 
 [sub_resource type="CylinderMesh" id="CylinderSlim"]
-radius_top = 0.0022
-radius_bottom = 0.0022
+top_radius = 0.0022
+bottom_radius = 0.0022
 height = 1.0
 
 [sub_resource type="SphereMesh" id="SphereGhost"]

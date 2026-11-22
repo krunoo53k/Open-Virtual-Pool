@@ -53,5 +53,7 @@ func _lay(node: MeshInstance3D, from: Vector3, to: Vector3) -> void:
 		rot = Quaternion(Vector3(1.0, 0.0, 0.0), 0.0 if dir.y > 0.0 else PI)
 	else:
 		rot = Quaternion(side.normalized(), acos(clampf(dir.y, -1.0, 1.0)))
-	var basis := Basis(rot).scaled(Vector3(1.0, span.length(), 1.0))
+	# stretch the local cylinder axis before rotating; Basis.scaled() scales
+	# rows, so scaling a rotated basis would stretch the radial axis instead.
+	var basis := Basis(rot) * Basis().scaled(Vector3(1.0, span.length(), 1.0))
 	node.transform = Transform3D(basis, (from + to) * 0.5)

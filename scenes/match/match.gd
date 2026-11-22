@@ -27,6 +27,7 @@ func _ready() -> void:
 	rack.positions = $BallRack.get_positions(); rack.rotations = $BallRack.get_orientations()
 	$BallInHandInput.layout = layout
 	$BallInHandInput.rack = rack
+	_wire_views(layout, sim)
 	state.remaining = RulingApply.full_rack()
 	$Shooter1.core = sim
 	$Shooter2.core = sim
@@ -76,6 +77,33 @@ func _on_shot_committed(params: ShotParams, player: int) -> void:
 		params.called_pocket = _called_pocket
 		_called_pocket = -1
 		take_shot(params)
+
+
+func _wire_views(layout: TableLayout, sim: PoolSimulation) -> void:
+	$CameraRig.table_centre = Vector3(layout.length * 0.5, 0.0, -layout.width * 0.5)
+	$CameraRig.refresh_view()
+	$BallInHandInput.camera = $CameraRig.get_active_camera()
+	$CameraRig.camera_changed.connect(_on_camera_changed)
+	$AimView.simulation = sim
+	$AimView.bind(rack)
+	$AimView.view_state_changed.connect(func(state: AimViewState):
+		$ViewHud.show_view(state)
+		$CameraRig.follow_aim($AimView.get_cue_position(), state.level_aim_deg))
+	$TurnFlow.player_activated.connect(_on_player_activated)
+	$TurnFlow.phase_entered.connect(_on_phase_view)
+
+
+func _on_camera_changed(cam: Camera3D) -> void:
+	$BallInHandInput.camera = cam
+
+
+func _on_player_activated(player: int) -> void:
+	$AimView.follow($Shooter1 if player == 1 else $Shooter2)
+
+
+func _on_phase_view(phase: String, _player: int) -> void:
+	$AimView.set_view_visible(phase == "AwaitingShot" or phase == "Striking")
+	$ViewHud.set_phase(phase)
 
 
 func _on_turn_changed(player: int) -> void:
