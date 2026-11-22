@@ -12,5 +12,5 @@ config_version=5
 
 config/name="Open Virtual Pool"
 config/description="A deterministic 8-ball pool game on the virtual pool physics core."
-run/main_scene="res://scenes/main.tscn"
+run/main_scene="res://scenes/main_menu/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
