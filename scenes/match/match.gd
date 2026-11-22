@@ -12,6 +12,7 @@ signal match_finished(winner: int)
 
 var state := MatchState.new()
 var rack := RackState.new()
+var _called_pocket := -1
 
 
 func _ready() -> void:
@@ -23,29 +24,30 @@ func _ready() -> void:
 		"ball_radius": layout.ball_radius})
 	$BallRack.rebuild()
 	rack.numbers = $BallRack.get_numbers()
-	rack.positions = $BallRack.get_positions()
-	rack.rotations = $BallRack.get_orientations()
+	rack.positions = $BallRack.get_positions(); rack.rotations = $BallRack.get_orientations()
+	$BallInHandInput.layout = layout
+	$BallInHandInput.rack = rack
 	state.remaining = RulingApply.full_rack()
-	_wire_shooters(sim)
+	$Shooter1.core = sim
+	$Shooter2.core = sim
+	$Shooter1.shot_committed.connect(_on_shot_committed.bind(1))
+	$Shooter2.shot_committed.connect(_on_shot_committed.bind(2))
 	var sequence = $MatchFlow
 	sequence.flow = $TurnFlow
 	sequence.rules = $Rules
 	sequence.playback = $ShotPlayback
 	sequence.rack_view = $BallRack
 	sequence.simulation = sim
-	sequence.set_layout(layout)
-	sequence.bind(state, rack)
+	sequence.ball_in_hand_input = $BallInHandInput
+	var shooters: Array[Node] = [$Shooter1, $Shooter2]
+	sequence.bind(state, rack, shooters)
 	sequence.turn_changed.connect(_on_turn_changed)
 	sequence.match_finished.connect(match_finished.emit)
+	sequence.judgement_made.connect($HudWiring.on_judgement)
+	$BallInHandInput.cue_ball_placed.connect(sequence.apply_cue_placement)
+	$HudWiring.wire($Hud, $Rules, state)
+	$HudWiring.pocket_called.connect(func(index: int): _called_pocket = index)
 	sequence.begin()
-
-
-func _wire_shooters(sim: PoolSimulation) -> void:
-	$Shooter1.core = sim
-	$Shooter2.core = sim
-	$Shooter1.shot_committed.connect(_on_shot_committed.bind(1))
-	$Shooter2.shot_committed.connect(_on_shot_committed.bind(2))
-	InputActions.register_defaults()
 
 
 ## The same entry a scripted player, an AI or a netcode peer calls.
@@ -66,16 +68,17 @@ func get_state() -> MatchState:
 
 
 func get_winner() -> int:
-	return $MatchFlow.winner
+	return $MatchFlow.get_winner()
 
 
 func _on_shot_committed(params: ShotParams, player: int) -> void:
 	if player == $TurnFlow.get_active_player():
+		params.called_pocket = _called_pocket
+		_called_pocket = -1
 		take_shot(params)
 
 
 func _on_turn_changed(player: int) -> void:
 	$Shooter1.rearm_after_the_settle()
 	$Shooter2.rearm_after_the_settle()
-	$HudLayer/TurnBadge.text = "Player %d to shoot" % player
 	turn_changed.emit(player)

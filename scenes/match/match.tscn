@@ -1,4 +1,5 @@
-[gd_scene load_steps=10 format=3]
+; lint-ignore: scene-too-big (the match composes eighteen leaves; the HUD and ball-in-hand input are each one single-purpose scene)
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scenes/match/match.gd" id="1_match"]
 [ext_resource type="PackedScene" path="res://scenes/table/table.tscn" id="2_table"]
@@ -9,6 +10,9 @@
 [ext_resource type="PackedScene" path="res://scenes/turn_flow/turn_flow.tscn" id="7_flow"]
 [ext_resource type="PackedScene" path="res://scenes/pool_simulation.tscn" id="9_sim"]
 [ext_resource type="PackedScene" path="res://scenes/match/match_flow/match_flow.tscn" id="10_sequence"]
+[ext_resource type="PackedScene" path="res://scenes/input/ball_in_hand_input/ball_in_hand_input.tscn" id="11_bih"]
+[ext_resource type="PackedScene" path="res://scenes/hud/hud.tscn" id="12_hud"]
+[ext_resource type="PackedScene" path="res://scenes/hud/hud_wiring/hud_wiring.tscn" id="13_wiring"]
 
 [sub_resource type="ProceduralSky" id="Sky_1"]
 
@@ -39,17 +43,16 @@ transform = Transform3D(1, 0, 0, 0, 0.6287, 0.7773, 0, -0.7773, 0.6287, 1.27, 1.
 
 [node name="Shooter2" parent="." instance=ExtResource("5_shooter")]
 
+[node name="BallInHandInput" parent="." instance=ExtResource("11_bih")]
+camera = NodePath("../Camera")
+
 [node name="Rules" parent="." instance=ExtResource("6_rules")]
 
 [node name="TurnFlow" parent="." instance=ExtResource("7_flow")]
 
 [node name="MatchFlow" parent="." instance=ExtResource("10_sequence")]
 
-[node name="HudLayer" type="CanvasLayer" parent="."]
+[node name="Hud" parent="." instance=ExtResource("12_hud")]
+process_mode = 3
 
-[node name="TurnBadge" type="Label" parent="HudLayer"]
-offset_left = 16.0
-offset_top = 12.0
-offset_right = 320.0
-offset_bottom = 40.0
-text = "Player 1 to shoot"
+[node name="HudWiring" parent="." instance=ExtResource("13_wiring")]

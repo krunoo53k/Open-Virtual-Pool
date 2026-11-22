@@ -66,9 +66,9 @@ func _run_game() -> void:
 	_check(game.rack.numbers.has(0) and game.rack.numbers.size() == rack_before_scratch,
 		"a scratch keeps the cue in the rack")
 	var cue: int = game.rack.numbers.find(0)
-	var spot := RackModel.head_spot(game.get_node("Simulation").layout)
-	_check(cue >= 0 and game.rack.positions[cue].distance_to(spot) < 0.0001,
-		"ball-in-hand respots the cue at the head spot")
+	_check(cue >= 0 and CuePlacement.is_legal(game.rack.positions[cue],
+		game.get_node("Simulation").layout, game.rack),
+		"ball-in-hand places the cue legally")
 	await _finish_game()
 
 
@@ -121,6 +121,8 @@ func _play(called: int) -> void:
 	$Match.take_shot(params)
 	var guard := 0
 	while $Match.get_phase() != "AwaitingShot" and $Match.get_phase() != "GameOver":
+		if $Match.get_phase() == "BallInHand":
+			PlacementHelper.place_cue($Match/BallInHandInput, $Match/Simulation.layout, $Match.rack)
 		await get_tree().process_frame
 		guard += 1
 		if guard > 900:
