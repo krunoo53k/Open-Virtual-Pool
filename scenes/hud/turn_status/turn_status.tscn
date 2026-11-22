@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/hud/turn_status/turn_status.gd" id="1_turn"]
+
+[node name="TurnStatus" type="VBoxContainer"]
+script = ExtResource("1_turn")
+
+[node name="TurnLabel" type="Label" parent="."]
+text = "player 1 to shoot"
+
+[node name="Groups" type="HBoxContainer" parent="."]
+
+[node name="P1Name" type="Label" parent="Groups"]
+text = "P1"
+
+[node name="P1Group" type="Label" parent="Groups"]
+text = "open"
+
+[node name="P2Name" type="Label" parent="Groups"]
+text = "P2"
+
+[node name="P2Group" type="Label" parent="Groups"]
+text = "open"
+
+[node name="RemainingLabel" type="Label" parent="."]
+text = "remaining: 15"
