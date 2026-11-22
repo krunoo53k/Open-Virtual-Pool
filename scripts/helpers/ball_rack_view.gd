@@ -27,9 +27,11 @@ static func apply_state(view: BallRack, rack: RackState) -> void:
 
 
 static func place_cue(view: BallRack, spot: Vector3) -> void:
-	if view.get_child_count() == 0:
+	var numbers := view.get_numbers()
+	var index := numbers.find(0)
+	if index < 0:
 		return
-	var ball := view.get_child(0) as Ball
+	var ball := view.get_child(index) as Ball
 	if ball != null:
 		ball.visible = true
 		ball.place(spot, Vector3.ZERO)

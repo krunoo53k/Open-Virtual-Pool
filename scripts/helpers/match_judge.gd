@@ -13,7 +13,10 @@ static func apply_and_advance(flow: TurnFlow, rules: EightBallRules, simulation:
 	var removed := outcome.pocketed.duplicate()
 	removed.append_array(outcome.off_table)
 	RulingApply.apply(state, ruling, removed)
-	RackModel.after_shot(shot, removed, rack)
+	if ruling.re_rack:
+		RackModel.rerack(rack_view, rack)
+	else:
+		RackModel.after_shot(shot, removed, rack)
 	BallRackView.apply_state(rack_view, rack)
 	if ruling.game_over:
 		flow.go_to("GameOver")
