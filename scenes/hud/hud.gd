@@ -39,6 +39,10 @@ func toggle_pause() -> void:
 	_pause.set_open(not _pause.is_open())
 
 
+func is_pause_open() -> bool:
+	return _pause.is_open()
+
+
 func _on_pocket_called(index: int) -> void:
 	pocket_called.emit(index)
 

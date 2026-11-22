@@ -7,6 +7,7 @@ class_name MatchFlow
 
 signal turn_changed(player: int)
 signal match_finished(winner: int)
+signal judgement_made(ruling: Judgement)
 
 @export var flow: TurnFlow
 @export var rules: EightBallRules
@@ -71,11 +72,17 @@ func _on_phase(phase: String, player: int) -> void:
 			playback.play(_shot, rack)
 			flow.go_to("Rolling")
 		"Judging":
-			var won := MatchJudge.apply_and_advance(flow, rules, simulation,
+			var ruling := MatchJudge.judge_and_apply(rules, simulation,
 				_shot, _outcome, _params, state, rack, rack_view)
-			if won != 0:
-				_winner = won
-				match_finished.emit(won)
+			judgement_made.emit(ruling)
+			if ruling.game_over:
+				_winner = ruling.winner
+				flow.go_to("GameOver")
+				match_finished.emit(_winner)
+			elif ruling.ball_in_hand:
+				flow.go_to("BallInHand")
+			else:
+				flow.activate(state.player)
 		"BallInHand":
 			if ball_in_hand_input != null:
 				ball_in_hand_input.activate()

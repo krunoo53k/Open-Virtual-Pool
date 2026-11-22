@@ -1,5 +1,7 @@
 extends Node
 
+# lint-ignore-file: script-too-long (one dev harness replays all 54 fixture rulings in scene order)
+
 ## Headless acceptance harness for issue #9: replay the BCA fixtures through
 ## real EightBallRules and real Hud, assert the HUD after every ruling, then
 ## drive ui_left / ui_right / ui_accept through the pocket picker. The exit
