@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/main_menu/main_menu.gd" id="1_menu"]
+[ext_resource type="PackedScene" path="res://scenes/boot_splash/boot_splash.tscn" id="2_splash"]
+[ext_resource type="PackedScene" path="res://scenes/main_menu/title_buttons/title_buttons.tscn" id="3_title"]
+[ext_resource type="PackedScene" path="res://scenes/main_menu/options_panel/options_panel.tscn" id="4_options"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.07, 0.12, 1)
+
+[node name="TitleButtons" parent="." instance=ExtResource("3_title")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="OptionsPanel" parent="." instance=ExtResource("4_options")]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="BootSplash" parent="." instance=ExtResource("2_splash")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0

@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/main_menu/remap_list/remap_list.gd" id="1_remap"]
+
+[node name="RemapList" type="Control"]
+custom_minimum_size = Vector2(0, 112)
+script = ExtResource("1_remap")
+
+[node name="Rows" type="VBoxContainer" parent="."]
+
+[node name="CueDraw" type="HBoxContainer" parent="Rows"]
+metadata/action = "cue_draw"
+
+[node name="Label" type="Label" parent="Rows/CueDraw"]
+text = "Draw"
+
+[node name="KeyOption" type="OptionButton" parent="Rows/CueDraw"]
+
+[node name="FineTrim" type="HBoxContainer" parent="Rows"]
+metadata/action = "fine_trim"
+
+[node name="Label" type="Label" parent="Rows/FineTrim"]
+text = "Fine trim"
+
+[node name="KeyOption" type="OptionButton" parent="Rows/FineTrim"]
+
+[node name="EnglishHold" type="HBoxContainer" parent="Rows"]
+metadata/action = "english_hold"
+
+[node name="Label" type="Label" parent="Rows/EnglishHold"]
+text = "English"
+
+[node name="KeyOption" type="OptionButton" parent="Rows/EnglishHold"]
+
+[node name="CameraToggle" type="HBoxContainer" parent="Rows"]
+metadata/action = "camera_toggle"
+
+[node name="Label" type="Label" parent="Rows/CameraToggle"]
+text = "Camera"
+
+[node name="KeyOption" type="OptionButton" parent="Rows/CameraToggle"]
