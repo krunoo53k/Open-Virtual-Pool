@@ -1,0 +1,59 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scenes/match/match.gd" id="1_match"]
+[ext_resource type="PackedScene" path="res://scenes/table/table.tscn" id="2_table"]
+[ext_resource type="PackedScene" path="res://scenes/rack/ball_rack/ball_rack.tscn" id="3_rack"]
+[ext_resource type="PackedScene" path="res://scenes/shot_playback/shot_playback.tscn" id="4_playback"]
+[ext_resource type="PackedScene" path="res://scenes/input/human_shooter/human_shooter.tscn" id="5_shooter"]
+[ext_resource type="PackedScene" path="res://scenes/rules/eight_ball_rules/eight_ball_rules.tscn" id="6_rules"]
+[ext_resource type="PackedScene" path="res://scenes/turn_flow/turn_flow.tscn" id="7_flow"]
+[ext_resource type="PackedScene" path="res://scenes/version_stamp/version_stamp.tscn" id="8_stamp"]
+[ext_resource type="PackedScene" path="res://scenes/pool_simulation.tscn" id="9_sim"]
+[ext_resource type="PackedScene" path="res://scenes/match/match_flow/match_flow.tscn" id="10_sequence"]
+
+[sub_resource type="ProceduralSky" id="Sky_1"]
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 2
+background_sky = SubResource("Sky_1")
+
+[node name="Match" type="Node3D"]
+script = ExtResource("1_match")
+simulation_scene = ExtResource("9_sim")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, -0.866025, 0, 0.866025, 0.5, 0, 3, 0)
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.6287, -0.7773, 0, 0.7773, 0.6287, 1.27, 1.9, 0.9)
+
+[node name="Table" parent="." instance=ExtResource("2_table")]
+
+[node name="BallRack" parent="." instance=ExtResource("3_rack")]
+
+[node name="ShotPlayback" parent="." instance=ExtResource("4_playback")]
+
+[node name="Shooter1" parent="." instance=ExtResource("5_shooter")]
+
+[node name="Shooter2" parent="." instance=ExtResource("5_shooter")]
+
+[node name="Rules" parent="." instance=ExtResource("6_rules")]
+
+[node name="TurnFlow" parent="." instance=ExtResource("7_flow")]
+
+[node name="MatchFlow" parent="." instance=ExtResource("10_sequence")]
+
+[node name="HudLayer" type="CanvasLayer" parent="."]
+
+[node name="TurnBadge" type="Label" parent="HudLayer"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 320.0
+offset_bottom = 40.0
+text = "Player 1 to shoot"
+
+[node name="VersionStamp" parent="." instance=ExtResource("8_stamp")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 1.27, 0.9, -0.635)

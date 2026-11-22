@@ -58,6 +58,12 @@ func outcome_of(shot: PoolShot) -> ShotOutcome:
 	return outcome
 
 
+## The shot's events, typed and in ball-number terms. The only index -> number
+## mapping sits here, behind the adapter's door, so the rules never see indices.
+func events_of(shot: PoolShot, rack: RackState) -> Array[ShotEvent]:
+	return ShotEvents.from_core(shot.get_events(), rack)
+
+
 ## What the same strike would do, short of running it.
 func preview_of(params: ShotParams) -> ShotPreview:
 	var direction = core.make_cue_direction(params.level_aim_deg, params.elevation_deg)

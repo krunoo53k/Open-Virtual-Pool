@@ -52,6 +52,14 @@ func carry_rotations(shot: PoolShot) -> void:
 	for v in final:
 		_orientations.append(v)
 
+func rebuild() -> void:
+	# Re-rack after the composer has handed over the core's own geometry.
+	for child in get_children():
+		remove_child(child)
+		child.queue_free()
+	_build()
+
+
 func get_numbers() -> PackedInt32Array:
 	return PackedInt32Array(_numbers)
 

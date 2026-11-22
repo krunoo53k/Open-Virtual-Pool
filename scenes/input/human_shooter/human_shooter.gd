@@ -13,7 +13,7 @@ class_name HumanShooter
 
 @export var core: PoolSimulation = null
 
-signal shot_prepared(params: ShotParams)
+signal shot_committed(params: ShotParams)
 
 var tuning: CueTuning = CueTuning.new()
 
@@ -93,7 +93,7 @@ func _on_stroke_released(power_m_s: float) -> void:
 	shot.contact_x = tip.x
 	shot.contact_y = tip.y
 	_shot_taken = true
-	shot_prepared.emit(shot)
+	shot_committed.emit(shot)
 
 func rearm_after_the_settle() -> void:
 	# The table has settled: the next stroke can start, and it starts
