@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://tools/eight_ball_fixture_test.gd" id="1_ft"]
+[ext_resource type="PackedScene" path="res://scenes/rules/eight_ball_rules/eight_ball_rules.tscn" id="2_er"]
+
+[node name="EightBallFixtureTest" type="Node"]
+script = ExtResource("1_ft")
+
+[node name="Rules" parent="." instance=ExtResource("2_er")]
