@@ -58,8 +58,9 @@ func _facts(events: Array[ShotEvent]) -> Dictionary:
                     if e.ball == 8:
                         eight_pocket = e.other
             "off-table":
-                if e.ball != 0:
-                    off.append(e.ball)
+                # a cue off the bed is a scratch; object balls keep their own reason.
+                if e.ball == 0: scratch = true
+                else: off.append(e.ball)
     return {
         "first": first,
         "contact_t": contact_t,
@@ -108,18 +109,18 @@ func _rule(outcome: ShotOutcome, params: ShotParams, events: Array[ShotEvent], s
         group = 2
     # "on the 8" reads the ball list exactly as BCA has it (§7.6)
     var on_eight := group != 0 and state.remaining.has(8)
-    if on_eight:
-        for n in state.remaining:
-            if n != 8 and group_of(n) == group:
-                on_eight = false
+    for n in state.remaining:
+        if n != 8 and group_of(n) == group:
+            on_eight = false
     var reason := _foul(facts, outcome, state, group, on_eight)
     var ruling := Judgement.new()
     ruling.foul_reason = reason
     if facts.pots.has(8):
         if state.break_next:
-            # the 8 off the break re-racks; the shooter re-breaks, no win or loss (§7.1)
+            # the 8 off the break re-racks; a fouled one goes to the other player.
             ruling.re_rack = true
-            ruling.next_player = shooter
+            ruling.ball_in_hand = reason != ""
+            ruling.next_player = other if reason != "" else shooter
             return ruling
         ruling.game_over = true
         var called_wins := bool(on_eight and not facts.scratch and params.called_pocket >= 0 and facts.eight_pocket == params.called_pocket and reason == "")

@@ -540,6 +540,61 @@
           "expect": {"foul_reason": "ball_off_table", "next_player": 1, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:ball_off_table", "ball_in_hand_granted:1", "turn_changed:1"]}
         }
       ]
+    },
+    {
+      "name": "cue ball off the table fouls with grant",
+      "notes": [
+        "the cue leaving the bed is a scratch, not an ignored event: the incoming player gets ball-in-hand"
+      ],
+      "shots": [
+        {
+          "name": "legal break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "P2 hits a ball, then the cue ball leaves the table",
+          "params": {"speed": 12.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": true},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 6, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 6, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "off-table", "ball": 0, "other": -1, "detail": 0, "time": 1.2}
+          ],
+          "expect": {"foul_reason": "scratch", "next_player": 1, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:scratch", "ball_in_hand_granted:1", "turn_changed:1"]}
+        }
+      ]
+    },
+    {
+      "name": "eight on the break with a scratch re-racks to the incoming player",
+      "notes": [
+        "the 8 off the break re-racks; the scratch is still a foul, so P2 re-breaks with ball-in-hand"
+      ],
+      "shots": [
+        {
+          "name": "break pots the 8 and scratches",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": true},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8},
+            {"kind": "pocket-drop", "ball": 8, "other": 0, "detail": 0, "time": 1.0},
+            {"kind": "pocket-drop", "ball": 0, "other": 3, "detail": 0, "time": 1.1}
+          ],
+          "expect": {"foul_reason": "scratch", "next_player": 2, "ball_in_hand": true, "re_rack": true, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:scratch", "ball_in_hand_granted:2", "turn_changed:2"]}
+        }
+      ]
     }
   ]
 }
