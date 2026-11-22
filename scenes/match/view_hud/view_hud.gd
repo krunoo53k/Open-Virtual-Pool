@@ -11,6 +11,7 @@ var _state: AimViewState
 
 
 func _ready() -> void:
+	InputActions.register_defaults()
 	$DebugPanel.visible = false
 
 

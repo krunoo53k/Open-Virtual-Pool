@@ -8,6 +8,12 @@ class_name CancelInput
 
 signal cancel_requested()
 
+func _ready() -> void:
+	# This leaf also runs standalone in the editor; do not depend on a
+	# sibling having registered the shared actions first.
+	InputActions.register_defaults()
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("cancel"):
 		cancel_requested.emit()

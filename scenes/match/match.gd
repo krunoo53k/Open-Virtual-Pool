@@ -16,6 +16,7 @@ var _called_pocket := -1
 
 
 func _ready() -> void:
+	InputActions.register_defaults()
 	var sim: PoolSimulation = simulation_scene.instantiate()
 	sim.name = "Simulation"
 	add_child(sim)

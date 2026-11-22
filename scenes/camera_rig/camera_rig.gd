@@ -22,6 +22,7 @@ var _on_cue := false  # which eye is showing now (the table by default).
 
 
 func _ready() -> void:
+	InputActions.register_defaults()
 	_table_view()
 
 
