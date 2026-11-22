@@ -17,10 +17,10 @@ background_sky = SubResource("Sky_1")
 environment = SubResource("Env_1")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.5, -0.866025, 0, 0.866025, 0.5, 0, 3, 0)
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 3, 0)
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.6287, -0.7773, 0, 0.7773, 0.6287, 1.27, 1.9, 0.9)
+transform = Transform3D(1, 0, 0, 0, 0.6287, 0.7773, 0, -0.7773, 0.6287, 1.27, 1.9, 0.9)
 
 [node name="Table" parent="." instance=ExtResource("2_table")]
 
