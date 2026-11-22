@@ -19,7 +19,7 @@ signal ball_in_hand_granted(player: int)
 signal turn_changed(player: int)
 signal game_over(winner: int)
 
-@export var min_break_rails := 4  # BCA: object balls driven to a rail on the break
+@export var min_break_rails := 4  # BCA: object balls to a rail on the break, unless a ball is potted
 
 
 func group_of(n: int) -> int:
@@ -73,6 +73,11 @@ func _facts(events: Array[ShotEvent]) -> Dictionary:
     }
 
 
+func _break_is_legal(facts: Dictionary) -> bool:
+    # BCA: a pot legalizes the break; otherwise >=4 object balls must reach a rail.
+    return facts.pots.size() > 0 or facts.driven.size() >= min_break_rails
+
+
 func _foul(facts: Dictionary, outcome: ShotOutcome, state: MatchState, group: int, on_eight: bool) -> String:
     # priority chain, top wins; the reason words are the fixture contract (§7.2)
     if facts.scratch:
@@ -88,13 +93,33 @@ func _foul(facts: Dictionary, outcome: ShotOutcome, state: MatchState, group: in
         return "no_contact"
     if facts.first >= 0 and not facts.rail_after and facts.pots.size() == 0 and not state.break_next:
         return "no_rail_after_contact"
-    if state.break_next and facts.driven.size() < min_break_rails:
+    if state.break_next and not _break_is_legal(facts):
         return "illegal_break"
     if outcome.miscue:
         return "miscue"
     if outcome.phase != "settled":
         return "incomplete_shot"
     return ""
+
+
+func _eight_ruling(ruling: Judgement, facts: Dictionary, params: ShotParams, state: MatchState, on_eight: bool) -> Judgement:
+    var shooter := state.player
+    var other := 3 - shooter
+    # the 8: off the bed loses, on the break re-racks, else the call decides.
+    if facts.off.has(8):
+        ruling.game_over = true
+        ruling.winner = other
+        ruling.next_player = 0
+    elif state.break_next:
+        ruling.re_rack = true
+        ruling.ball_in_hand = ruling.foul_reason != ""
+        ruling.next_player = other if ruling.foul_reason != "" else shooter
+    else:
+        ruling.game_over = true
+        var called_wins := bool(on_eight and not facts.scratch and params.called_pocket >= 0 and facts.eight_pocket == params.called_pocket and ruling.foul_reason == "")
+        ruling.winner = shooter if called_wins else other
+        ruling.next_player = 0
+    return ruling
 
 
 func _rule(outcome: ShotOutcome, params: ShotParams, events: Array[ShotEvent], state: MatchState) -> Judgement:
@@ -115,20 +140,11 @@ func _rule(outcome: ShotOutcome, params: ShotParams, events: Array[ShotEvent], s
     var reason := _foul(facts, outcome, state, group, on_eight)
     var ruling := Judgement.new()
     ruling.foul_reason = reason
-    if facts.pots.has(8):
-        if state.break_next:
-            # the 8 off the break re-racks; a fouled one goes to the other player.
-            ruling.re_rack = true
-            ruling.ball_in_hand = reason != ""
-            ruling.next_player = other if reason != "" else shooter
-            return ruling
-        ruling.game_over = true
-        var called_wins := bool(on_eight and not facts.scratch and params.called_pocket >= 0 and facts.eight_pocket == params.called_pocket and reason == "")
-        ruling.winner = shooter if called_wins else other
-        ruling.next_player = 0
-        return ruling
-    if state.break_next and reason != "":
-        # a foul break re-racks; the incoming player breaks with ball-in-hand
+    if facts.pots.has(8) or facts.off.has(8):
+        return _eight_ruling(ruling, facts, params, state, on_eight)
+    if state.break_next and not _break_is_legal(facts):
+        # an illegal break re-racks; a foul on a legal break only grants
+        # ball-in-hand and leaves the table where it lies.
         ruling.re_rack = true
     ruling.ball_in_hand = reason != ""
     if state.solids_player == 0 and not state.break_next and reason == "" and facts.pots.size() > 0:

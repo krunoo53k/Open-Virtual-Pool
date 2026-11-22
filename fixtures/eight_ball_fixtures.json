@@ -4,7 +4,7 @@
     "name": "fixture label",
     "shots": "ordered shots; the runner folds each ruling into a MatchState",
     "params": "ShotParams fields (nulls use defaults); called_pocket: -1 = no call, else core pocket index 0-5 (corners first, then sides)",
-    "outcome": "ShotOutcome fields: outcome_of (solved|settling|unsimulated|error), phase_reached (still balls|settle|settling|jumped|hit|model state), miscue, foul (advisory only)",
+    "outcome": "ShotOutcome fields: outcome_of (solved|settling|unsimulated|error), phase_reached (descriptive only; the runner maps outcome_of to the core phase word), miscue, foul (advisory only)",
     "events": "ShotEvent list in shot order: kind is the core word (ball-ball|cushion|jaw|slate|state|pocket-enter|pocket-drop|pocket-exit|off-table); ball = ball number (cue 0); other = other ball number / rail index / core pocket index (-1 unused); detail = core detail word count, 0 here; time = shot-clock seconds",
     "expect": "Judgement fields the rules must return + signals list: 'name:payload' in announce order (foul_committed before groups_assigned/ball_in_hand_granted; game_over replaces turn_changed)"
   },
@@ -593,6 +593,204 @@
             {"kind": "pocket-drop", "ball": 0, "other": 3, "detail": 0, "time": 1.1}
           ],
           "expect": {"foul_reason": "scratch", "next_player": 2, "ball_in_hand": true, "re_rack": true, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:scratch", "ball_in_hand_granted:2", "turn_changed:2"]}
+        }
+      ]
+    },
+    {
+      "name": "a pot legalizes a break with fewer than four rails",
+      "notes": [
+        "BCA: a break is legal when a ball is pocketed or >=4 object balls reach a rail",
+        "three rails plus a pot is legal; the shooter continues and the table stays open"
+      ],
+      "shots": [
+        {
+          "name": "break: three rails and a pot",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "pocket-drop", "ball": 9, "other": 2, "detail": 0, "time": 0.9}
+          ],
+          "expect": {"foul_reason": "", "next_player": 1, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:1"]}
+        }
+      ]
+    },
+    {
+      "name": "illegal break: three rails and no pot re-racks",
+      "notes": [
+        "BCA: no pot and fewer than four object balls to a rail is an illegal break",
+        "the project model re-racks and gives the incoming player the break with ball-in-hand"
+      ],
+      "shots": [
+        {
+          "name": "break: three rails, no pot",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7}
+          ],
+          "expect": {"foul_reason": "illegal_break", "next_player": 2, "ball_in_hand": true, "re_rack": true, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:illegal_break", "ball_in_hand_granted:2", "turn_changed:2"]}
+        }
+      ]
+    },
+    {
+      "name": "a scratch on a legal break does not re-rack",
+      "notes": [
+        "four object balls to a rail make the break legal; the scratch is a standard foul",
+        "the incoming player gets ball-in-hand and the table stays where it lies"
+      ],
+      "shots": [
+        {
+          "name": "legal break, cue scratches",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": true},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8},
+            {"kind": "pocket-drop", "ball": 0, "other": 3, "detail": 0, "time": 1.1}
+          ],
+          "expect": {"foul_reason": "scratch", "next_player": 2, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:scratch", "ball_in_hand_granted:2", "turn_changed:2"]}
+        }
+      ]
+    },
+    {
+      "name": "the 8 driven off the table on the break loses the game",
+      "notes": [
+        "BCA: driving the 8 off the bed is loss of game; the break exception only covers pocketing it"
+      ],
+      "shots": [
+        {
+          "name": "legal break, the 8 leaves the table",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": true},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8},
+            {"kind": "off-table", "ball": 8, "other": -1, "detail": 2, "time": 1.2}
+          ],
+          "expect": {"foul_reason": "ball_off_table", "next_player": 0, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": true, "winner": 2, "signals": ["foul_committed:ball_off_table", "game_over:2"]}
+        }
+      ]
+    },
+    {
+      "name": "the 8 driven off the table after the break loses the game",
+      "notes": [
+        "P2 clears the stripes, then drives the 8 off the bed while on it: loss of game"
+      ],
+      "shots": [
+        {
+          "name": "legal break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "open pot of 9 sets stripes for P2",
+          "params": {"speed": 8.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 9, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 9, "other": 1, "detail": 0, "time": 0.6},
+            {"kind": "pocket-drop", "ball": 9, "other": 1, "detail": 0, "time": 1.0}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 1, "game_over": false, "winner": 0, "signals": ["groups_assigned:1", "turn_changed:2"]}
+        },
+        {
+          "name": "P2 clears the rest of the stripes",
+          "params": {"speed": 10.0, "level_aim_deg": 120.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 11, "detail": 0, "time": 0.3},
+            {"kind": "pocket-drop", "ball": 11, "other": 2, "detail": 0, "time": 0.9},
+            {"kind": "pocket-drop", "ball": 12, "other": 2, "detail": 0, "time": 1.1},
+            {"kind": "pocket-drop", "ball": 13, "other": 2, "detail": 0, "time": 1.3},
+            {"kind": "pocket-drop", "ball": 14, "other": 2, "detail": 0, "time": 1.5},
+            {"kind": "pocket-drop", "ball": 15, "other": 2, "detail": 0, "time": 1.7},
+            {"kind": "pocket-drop", "ball": 10, "other": 2, "detail": 0, "time": 1.9}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "P2 on the eight drives it off the table",
+          "params": {"speed": 7.0, "level_aim_deg": 80.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": true},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 8, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 8, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "off-table", "ball": 8, "other": -1, "detail": 0, "time": 1.2}
+          ],
+          "expect": {"foul_reason": "ball_off_table", "next_player": 0, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": true, "winner": 1, "signals": ["foul_committed:ball_off_table", "game_over:1"]}
+        }
+      ]
+    },
+    {
+      "name": "a miscue on a legal break fouls without a re-rack",
+      "notes": [
+        "the break drove four balls to a rail, so only the miscue foul applies"
+      ],
+      "shots": [
+        {
+          "name": "legal break with a miscue",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": true, "foul": true},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "miscue", "next_player": 2, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:miscue", "ball_in_hand_granted:2", "turn_changed:2"]}
+        }
+      ]
+    },
+    {
+      "name": "a shot cut off while balls still move is incomplete",
+      "notes": [
+        "the core reports settling (the time limit cut the shot); the ruling is incomplete_shot"
+      ],
+      "shots": [
+        {
+          "name": "legal break",
+          "params": {"speed": 15.0, "level_aim_deg": 74.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "solved", "phase_reached": "still balls", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 1, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 3, "other": 2, "detail": 1, "time": 0.5},
+            {"kind": "cushion", "ball": 5, "other": 4, "detail": 0, "time": 0.6},
+            {"kind": "cushion", "ball": 7, "other": 1, "detail": 0, "time": 0.7},
+            {"kind": "cushion", "ball": 9, "other": 3, "detail": 0, "time": 0.8}
+          ],
+          "expect": {"foul_reason": "", "next_player": 2, "ball_in_hand": false, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["turn_changed:2"]}
+        },
+        {
+          "name": "settling shot after a legal hit",
+          "params": {"speed": 9.0, "level_aim_deg": 90.0, "called_pocket": -1},
+          "outcome": {"outcome_of": "settling", "phase_reached": "settling", "miscue": false, "foul": false},
+          "events": [
+            {"kind": "ball-ball", "ball": 0, "other": 6, "detail": 0, "time": 0.3},
+            {"kind": "cushion", "ball": 6, "other": 1, "detail": 0, "time": 0.6}
+          ],
+          "expect": {"foul_reason": "incomplete_shot", "next_player": 1, "ball_in_hand": true, "re_rack": false, "solids_player": 0, "game_over": false, "winner": 0, "signals": ["foul_committed:incomplete_shot", "ball_in_hand_granted:1", "turn_changed:1"]}
         }
       ]
     }

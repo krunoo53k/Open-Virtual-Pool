@@ -82,6 +82,7 @@ func _mk(shot: Dictionary) -> Dictionary:
         e.ball = int(d["ball"])
         e.other = int(d["other"])
         e.time = float(d["time"])
+        e.detail = int(d.get("detail", 0))
         evs.append(e)
     return {"params": p, "outcome": o, "events": evs}
 
