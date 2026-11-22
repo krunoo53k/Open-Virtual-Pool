@@ -30,6 +30,47 @@ godot --headless --path . scenes/smoke.tscn
 The `VersionStamp` scene prints and shows `PoolCore.get_model_version` (1.8) on
 any running screen, so the loaded extension can be identified while playing.
 
+## Run the menu
+
+`scenes/main_menu/main_menu.tscn` stands alone; a boot splash gives way to the
+title screen:
+
+```sh
+godot --path . res://scenes/main_menu/main_menu.tscn
+```
+
+- **Play (hotseat 2P)** navigates to `res://scenes/match/match.tscn`. That
+  scene arrives with the match-flow work; until it is present the menu prints
+  a clear message and stays where it is instead of erroring.
+- **Options** opens the display/input panel. *Display mode* picks windowed or
+  fullscreen (a no-op in headless runs). The action → key rows rebind the
+  InputMap actions declared in `scripts/helpers/input_actions.gd`; **Back**
+  returns to the title.
+- **Quit** exits with code 0.
+
+Display mode and the key bindings are saved to `user://open_virtual_pool.cfg`
+(`[display] fullscreen`, and `[input]` with one label per action). The file is
+written on the first change and read again whenever the menu starts.
+
+The two headless acceptance commands both exit 0 when the splash, buttons,
+Play target, config round-trip and Quit path hold:
+
+```sh
+godot --headless --path . res://tools/main_menu_test.tscn
+godot --headless --path . res://tools/menu_quit_test.tscn
+```
+
+## Screenshots
+
+No screenshot assets are committed yet, so none are embedded. Follow-up:
+capture the title screen and the options panel, then centre each image with
+its caption directly underneath:
+
+```html
+<p align="center"><img src="docs/screenshots/title.png" alt="Title screen" width="640"></p>
+<p align="center"><em>Title screen — Play, Options, Quit.</em></p>
+```
+
 ## Layout
 
 - `project.godot` — Godot 4.7, Forward+; the extension targets api-4.6
