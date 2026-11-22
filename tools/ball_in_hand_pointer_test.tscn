@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://tools/ball_in_hand_pointer_test.gd" id="1_test"]
+[ext_resource type="PackedScene" path="res://scenes/input/ball_in_hand_input/ball_in_hand_input.tscn" id="2_bih"]
+
+[node name="BallInHandPointerTest" type="Node3D"]
+script = ExtResource("1_test")
+
+[node name="Camera" type="Camera3D" parent="."]
+
+[node name="BallInHandInput" parent="." instance=ExtResource("2_bih")]
