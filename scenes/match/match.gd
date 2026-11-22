@@ -25,6 +25,8 @@ func _ready() -> void:
 	rack.numbers = $BallRack.get_numbers()
 	rack.positions = $BallRack.get_positions()
 	rack.rotations = $BallRack.get_orientations()
+	$BallInHandInput.layout = layout
+	$BallInHandInput.rack = rack
 	state.remaining = RulingApply.full_rack()
 	_wire_shooters(sim)
 	var sequence = $MatchFlow
@@ -33,10 +35,11 @@ func _ready() -> void:
 	sequence.playback = $ShotPlayback
 	sequence.rack_view = $BallRack
 	sequence.simulation = sim
-	sequence.set_layout(layout)
+	sequence.ball_in_hand_input = $BallInHandInput
 	sequence.bind(state, rack)
 	sequence.turn_changed.connect(_on_turn_changed)
 	sequence.match_finished.connect(match_finished.emit)
+	$BallInHandInput.cue_ball_placed.connect(sequence.apply_cue_placement)
 	sequence.begin()
 
 
@@ -66,7 +69,7 @@ func get_state() -> MatchState:
 
 
 func get_winner() -> int:
-	return $MatchFlow.winner
+	return $MatchFlow.get_winner()
 
 
 func _on_shot_committed(params: ShotParams, player: int) -> void:

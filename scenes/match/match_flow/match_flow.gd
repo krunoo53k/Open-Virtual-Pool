@@ -13,12 +13,12 @@ signal match_finished(winner: int)
 @export var playback: ShotPlayback
 @export var rack_view: BallRack
 @export var simulation: PoolSimulation
+@export var ball_in_hand_input: BallInHandInput
 
 var state: MatchState
 var rack: RackState
-var winner := 0
 
-var _layout: TableLayout
+var _winner := 0
 var _shot  # PoolShot, the path under replay.
 var _outcome: ShotOutcome
 var _params: ShotParams
@@ -29,10 +29,6 @@ func bind(match_state: MatchState, rack_state: RackState) -> void:
 	rack = rack_state
 	flow.phase_entered.connect(_on_phase)
 	playback.path_finished.connect(_on_path_finished)
-
-
-func set_layout(value: TableLayout) -> void:
-	_layout = value
 
 
 func begin() -> void:
@@ -55,7 +51,13 @@ func get_current_player() -> int:
 	return state.player
 
 
+func get_winner() -> int:
+	return _winner
+
+
 func _on_phase(phase: String, player: int) -> void:
+	if ball_in_hand_input != null and phase != "BallInHand":
+		ball_in_hand_input.deactivate()
 	match phase:
 		"AwaitingShot":
 			rack_view.visible = true
@@ -72,14 +74,23 @@ func _on_phase(phase: String, player: int) -> void:
 			var won := MatchJudge.apply_and_advance(flow, rules, simulation,
 				_shot, _outcome, _params, state, rack, rack_view)
 			if won != 0:
-				winner = won
+				_winner = won
 				match_finished.emit(won)
 		"BallInHand":
-			# #7's neutral head-spot; #8 replaces it with mouse placement.
-			var spot := RackModel.head_spot(_layout)
-			RackModel.respot_cue(rack, spot)
-			BallRackView.place_cue(rack_view, spot)
-			flow.activate(state.player)
+			if ball_in_hand_input != null:
+				ball_in_hand_input.activate()
+
+
+## The placement scene's public event: fold the chosen spot into the rack and
+## resume the incoming player. The input never starts the shot flow itself.
+func apply_cue_placement(position: Vector3) -> void:
+	if flow.get_phase() != "BallInHand":
+		return
+	RackModel.respot_cue(rack, position)
+	BallRackView.place_cue(rack_view, position)
+	if ball_in_hand_input != null:
+		ball_in_hand_input.deactivate()
+	flow.activate(state.player)
 
 
 func _on_path_finished(_path) -> void:

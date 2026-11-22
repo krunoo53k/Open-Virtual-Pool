@@ -110,6 +110,8 @@ func _play(called: int) -> void:
 	$Match.take_shot(params)
 	var guard := 0
 	while $Match.get_phase() != "AwaitingShot" and $Match.get_phase() != "GameOver":
+		if $Match.get_phase() == "BallInHand":
+			PlacementHelper.place_cue($Match/BallInHandInput, $Match/Simulation.layout, $Match.rack)
 		await get_tree().process_frame
 		guard += 1
 		if guard > 900:

@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/input/ball_in_hand_input/ball_in_hand_input.gd" id="1_bih"]
+
+[sub_resource type="SphereMesh" id="GhostBall"]
+radius = 0.028575
+height = 0.05715
+radial_segments = 24
+rings = 16
+
+[sub_resource type="StandardMaterial3D" id="MatLegal"]
+albedo_color = Color(0.1, 0.9, 0.3, 0.55)
+transparency = 1
+
+[sub_resource type="StandardMaterial3D" id="MatIllegal"]
+albedo_color = Color(0.95, 0.15, 0.15, 0.55)
+transparency = 1
+
+[node name="BallInHandInput" type="Node3D"]
+script = ExtResource("1_bih")
+
+[node name="GhostMarker" type="Node3D" parent="."]
+visible = false
+
+[node name="Legal" type="MeshInstance3D" parent="GhostMarker"]
+mesh = SubResource("GhostBall")
+material_override = SubResource("MatLegal")
+
+[node name="Illegal" type="MeshInstance3D" parent="GhostMarker"]
+mesh = SubResource("GhostBall")
+material_override = SubResource("MatIllegal")
+visible = false
