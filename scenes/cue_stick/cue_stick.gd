@@ -24,6 +24,14 @@ func set_pose(state: CueStickState) -> void:
 	# the ferrule hugs the tip, the shaft fills the rest towards the butt.
 	_lay($Ferrule, tip, tip - dir * FERRULE_M)
 	_lay($Shaft, tip - dir * FERRULE_M, butt)
+	# The red mark sits where the tip actually meets the ball, not on the
+	# rim: a small english is a small mark near the centre (§6.3).
+	var right := flat.cross(Vector3.UP)
+	var offset := right * state.contact.x + Vector3.UP * state.contact.y
+	var depth := sqrt(maxf(state.ball_radius_m * state.ball_radius_m
+		- offset.length_squared(), 0.0))
+	$TipMarker.visible = state.contact.length_squared() > 1.0e-12
+	$TipMarker.global_position = state.pivot - flat * depth + offset
 
 
 func _lay(node: MeshInstance3D, from: Vector3, to: Vector3) -> void:

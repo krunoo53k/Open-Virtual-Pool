@@ -12,6 +12,20 @@ signal view_state_changed(state: AimViewState)
 var _rack: RackState
 var _shooter: HumanShooter
 var _state: AimViewState
+var _signature := ""
+
+
+func _process(_delta: float) -> void:
+	# Leaf gestures are continuous (the draw in particular), so compare the
+	# typed snapshot each frame instead of trusting signal ordering.
+	if _shooter == null:
+		return
+	var state := AimStateReader.read(_shooter)
+	var signature := "%f|%f|%f|%f|%f|%f" % [state.level_aim_deg, state.elevation_deg,
+		state.english.x, state.english.y, state.pull_m, state.speed_m_s]
+	if signature != _signature:
+		_signature = signature
+		_refresh()
 
 
 func bind(rack: RackState) -> void:
@@ -64,6 +78,8 @@ func _refresh() -> void:
 	pose.level_aim_deg = state.level_aim_deg
 	pose.axis_elevation_deg = preview.elevation_deg
 	pose.tip_gap_m = simulation.layout.ball_radius + state.pull_m
+	pose.contact = state.english
+	pose.ball_radius_m = simulation.layout.ball_radius
 	$CueStick.set_pose(pose)
 	$AimPreview.show_stretch(cue, preview, ghost)
 	_state = state

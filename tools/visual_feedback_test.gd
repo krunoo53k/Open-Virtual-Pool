@@ -7,6 +7,7 @@ extends Node3D
 var _fails := 0
 
 
+# lint-ignore: long-func (one harness drives the whole view feedback sequence in order)
 func _ready() -> void:
 	var game = $Match
 	for _i in range(3):
@@ -24,10 +25,15 @@ func _ready() -> void:
 	_check(cue.transform != before, "the cue follows the aim gesture")
 	_check(game.get_node("AimView").get_state() != null, "typed view state reached the aim view")
 
+	var pose_before: Transform3D = cue.transform
 	shooter.get_stroke_leaf().start_stroke()
 	shooter.get_stroke_leaf().draw_motion(Vector2(0.0, 120.0))
 	await get_tree().process_frame
 	_check(AimStateReader.read(shooter).pull_m > 0.0, "the draw reaches the view state")
+	_check(cue.transform != pose_before, "the cue pulls back with the draw")
+	shooter.get_english_leaf().tip_dragged(Vector2(20.0, 0.0), false)
+	await get_tree().process_frame
+	_check(game.get_node("AimView/CueStick/TipMarker").visible, "the tip marker shows english")
 	shooter.get_stroke_leaf().draw_motion(Vector2(0.0, -120.0))
 	await get_tree().process_frame
 	_check(hud.get_node("PowerBar").value > 0.0, "the power bar shows the stroke speed")

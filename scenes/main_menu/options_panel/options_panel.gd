@@ -23,6 +23,7 @@ func _ready() -> void:
 	_display.add_item("Fullscreen")
 	_display.item_selected.connect(_on_display_selected)
 	_remaps.key_changed.connect(_on_key_changed)
+	$Panel/Margin/VBox/ResetKeys.pressed.connect(_on_reset_keys_pressed)
 	$Panel/Margin/VBox/Back.pressed.connect(_on_back_pressed)
 	load_options()
 
@@ -36,6 +37,17 @@ func _on_key_changed(action: String, label: String) -> void:
 	input_remapped.emit(action, label)
 	if not _syncing:
 		save_options()
+
+
+func _on_reset_keys_pressed() -> void:
+	# A saved remap survives restarts; this restores the shipped bindings and
+	# writes them back so the next launch agrees with what is on screen.
+	for action in RemapList.ACTIONS:
+		var code := int(InputActions.DEFAULTS.get(action, -1))
+		var label := InputRemap.label_for_code(code)
+		if not label.is_empty():
+			set_key(action, label)
+	save_options()
 
 
 func _on_back_pressed() -> void:

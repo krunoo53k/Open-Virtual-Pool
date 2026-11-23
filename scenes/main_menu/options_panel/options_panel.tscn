@@ -58,5 +58,8 @@ text = "Input (action -> key)"
 
 [node name="RemapList" parent="Panel/Margin/VBox" instance=ExtResource("2_remap")]
 
+[node name="ResetKeys" type="Button" parent="Panel/Margin/VBox"]
+text = "Reset keys to defaults"
+
 [node name="Back" type="Button" parent="Panel/Margin/VBox"]
 text = "Back"
