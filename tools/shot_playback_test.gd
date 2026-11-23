@@ -68,6 +68,19 @@ func _worst_final_delta(shot: PoolShot, rack: RackState) -> float:
 	return worst
 
 
+func _check_replay_reset(shot: PoolShot, rack: RackState) -> bool:
+	# A second shot must replace the first set outright: keeping the old
+	# instances would leave their final positions on the cloth as stale balls.
+	($ShotPlayback).play(shot, rack)
+	var laid := ($ShotPlayback).get_child_count()
+	print("replay ball count after a second play: ", laid)
+	if laid != rack.numbers.size():
+		printerr("playback check: a second play kept ", laid - rack.numbers.size(),
+			" stale balls from the last shot")
+		return false
+	return true
+
+
 func _ready() -> void:
 	var rack := build_rack()
 	var params := _strike_params()
@@ -85,8 +98,7 @@ func _ready() -> void:
 		get_tree().quit(1)
 		return
 	var duration = shot.get_duration()
-	print("replay clock: ", ($ShotPlayback).get_elapsed(), " s of ", duration,
-		" s in ", steps, " steps")
+	print("replay clock: ", ($ShotPlayback).get_elapsed(), " s of ", duration, " s in ", steps, " steps")
 	if not is_equal_approx(($ShotPlayback).get_elapsed(), duration):
 		printerr("playback check: the clock missed the duration: ",
 			($ShotPlayback).get_elapsed(), " vs ", duration)
@@ -103,6 +115,9 @@ func _ready() -> void:
 			" m off the core's final frame")
 		get_tree().quit(1)
 		return
+	if not _check_replay_reset(shot, rack):
+		get_tree().quit(1)
+		return
 	print("playback check: green - ended on duration, balls within budget, ",
-		"signal seen")
+		"signal seen, no stale balls")
 	get_tree().quit(0)
