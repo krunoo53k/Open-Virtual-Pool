@@ -11,7 +11,7 @@ signal aim_turned(turn_degrees: float)
 
 var tuning: CueTuning = CueTuning.new()
 
-var _level_aim_deg := 90.0
+var _level_aim_deg := 0.0  # deg: down the table towards the rack, not into the camera.
 
 func aim_dragged(relative: Vector2, fine: bool) -> void:
 	# LOOK_SPEED of a radian per pixel of drag, turned off the way a first

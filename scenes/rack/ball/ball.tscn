@@ -9,8 +9,8 @@ radial_segments = 32
 rings = 16
 
 [sub_resource type="CylinderMesh" id="StripeBand"]
-radius_top = 1.01
-radius_bottom = 1.01
+top_radius = 1.01
+bottom_radius = 1.01
 height = 1.2
 
 [node name="Ball" type="Node3D"]

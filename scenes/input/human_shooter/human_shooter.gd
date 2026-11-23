@@ -14,6 +14,8 @@ class_name HumanShooter
 @export var core: PoolSimulation = null
 
 signal shot_committed(params: ShotParams)
+# Views call get_view_state() on this signal; display only, no rules.
+signal aim_state_changed()
 
 var tuning: CueTuning = CueTuning.new()
 
@@ -22,8 +24,9 @@ var _shot_taken := false
 func _ready() -> void:
 	InputActions.register_defaults()
 	$EnglishInput.core = core
-	$CancelInput.cancel_requested.connect(_on_cancel_requested)
-	$StrokeInput.stroke_released.connect(_on_stroke_released)
+	$CancelInput.cancel_requested.connect(_on_cancel_requested); $StrokeInput.stroke_released.connect(_on_stroke_released)
+	AimViewSignals.wire(self)
+
 
 func get_aim_leaf() -> AimInput:
 	return $AimInput

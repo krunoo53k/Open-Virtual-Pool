@@ -10,6 +10,7 @@ class_name StrokeInput
 ## came home struck nothing, so its speed is no power.
 
 signal stroke_updated(power_m_s: float)
+signal stroke_draw_changed(pull_m: float)
 signal stroke_released(power_m_s: float)
 signal charge_forgotten()
 
@@ -63,6 +64,8 @@ func draw_motion(relative: Vector2) -> void:
 	_motion_clock = _clock
 	var was := _draw
 	_draw = clampf(_draw + relative.y * tuning.draw_speed_m_per_px, 0.0, tuning.max_pull_m)
+	if _draw != was:
+		stroke_draw_changed.emit(_draw)
 	if _draw > _pulled:
 		# The cue is deeper than it has ever been: the run of the stroke
 		# starts again, from the cue's furthest back. The backswing caps
@@ -89,7 +92,10 @@ func is_charging() -> bool:
 	return _charging and not _fired
 
 func get_pull_m() -> float:
-	return _pulled
+	# The view draws the cue's CURRENT position, not the furthest point of
+	# the backswing (that maximum is only the run length for the power).
+	# With zero draw the tip sits on the ball, before and after a stroke.
+	return _draw
 
 func get_speed_m_s() -> float:
 	return _speed

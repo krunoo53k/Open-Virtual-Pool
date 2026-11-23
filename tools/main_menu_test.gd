@@ -30,6 +30,9 @@ func _ready() -> void:
 	_panel.display_mode_changed.connect(_on_display_mode_changed)
 	_panel.input_remapped.connect(_on_input_remapped)
 	_round_trip()
+	_panel.get_node("Panel/Margin/VBox/ResetKeys").pressed.emit()
+	_check(InputRemap.label_for_action("cue_draw") == "S",
+		"reset restores the shipped S binding")
 	if _fails.is_empty():
 		print("MAIN MENU OK: splash, buttons, Play target and the options round-trip hold")
 	else:

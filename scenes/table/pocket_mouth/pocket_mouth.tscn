@@ -1,13 +1,13 @@
 [gd_scene load_steps=3 format=3]
 
 [sub_resource type="CylinderMesh" id="Cylinder_1"]
-radius_top = 1.0
-radius_bottom = 1.0
+top_radius = 1.0
+bottom_radius = 1.0
 height = 1.0
 
 [sub_resource type="StandardMaterial3D" id="Material_1"]
 albedo_color = Color(0.02, 0.02, 0.02, 1)
-cull_disabled = true
+cull_mode = 2
 
 [node name="PocketMouth" type="Node3D"]
 

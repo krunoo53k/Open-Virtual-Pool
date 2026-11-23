@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/match/view_hud/view_hud.gd" id="1_hud"]
+
+[node name="ViewHud" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="PowerBar" type="ProgressBar" parent="."]
+offset_left = 16.0
+offset_top = 52.0
+offset_right = 236.0
+offset_bottom = 68.0
+max_value = 100.0
+value = 0.0
+show_percentage = false
+
+[node name="DebugPanel" type="Label" parent="."]
+anchors_preset = 1
+offset_left = -660.0
+offset_top = 44.0
+offset_right = -16.0
+offset_bottom = 200.0
+visible = false

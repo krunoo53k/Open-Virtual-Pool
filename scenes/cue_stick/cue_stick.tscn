@@ -1,19 +1,26 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scenes/cue_stick/cue_stick.gd" id="1_cs"]
 
 [sub_resource type="CylinderMesh" id="CylinderShaft"]
-radius_top = 0.0095
-radius_bottom = 0.003
+top_radius = 0.012
+bottom_radius = 0.005
 height = 1.0
 
 [sub_resource type="CylinderMesh" id="CylinderFerrule"]
-radius_top = 0.0042
-radius_bottom = 0.0042
+top_radius = 0.0042
+bottom_radius = 0.0042
 height = 1.0
 
 [sub_resource type="StandardMaterial3D" id="MatShaft"]
-albedo_color = Color(0.45, 0.27, 0.12, 1)
+albedo_color = Color(0.92, 0.72, 0.38, 1)
+
+[sub_resource type="SphereMesh" id="TipMark"]
+radius = 0.005
+height = 0.01
+
+[sub_resource type="StandardMaterial3D" id="MatTip"]
+albedo_color = Color(0.9, 0.2, 0.2, 1)
 
 [node name="CueStick" type="Node3D"]
 script = ExtResource("1_cs")
@@ -25,4 +32,9 @@ visible = false
 
 [node name="Ferrule" type="MeshInstance3D" parent="."]
 mesh = SubResource("CylinderFerrule")
+visible = false
+
+[node name="TipMarker" type="MeshInstance3D" parent="."]
+mesh = SubResource("TipMark")
+material_override = SubResource("MatTip")
 visible = false

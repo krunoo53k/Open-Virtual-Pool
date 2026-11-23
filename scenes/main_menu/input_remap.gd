@@ -36,6 +36,13 @@ static func label_for_action(action: String) -> String:
 	return ""
 
 
+static func label_for_code(code: int) -> String:
+	for label in KEY_CODES:
+		if KEY_CODES[label] == code:
+			return str(label)
+	return ""
+
+
 static func apply(action: String, label: String) -> void:
 	if not KEY_CODES.has(label):
 		return

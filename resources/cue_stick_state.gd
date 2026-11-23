@@ -19,3 +19,5 @@ class_name CueStickState extends Resource
 @export var level_aim_deg := 90.0  # deg: from the table's long axis towards the shooter's left.
 @export var axis_elevation_deg := 0.0  # deg: cue axis tilt read off the shot; raised butt negative.
 @export var tip_gap_m := 0.032  # m: ball centre to tip along the cue axis.
+@export var contact := Vector2.ZERO  # m: where the tip meets the ball, shooter's right/up.
+@export var ball_radius_m := 0.028575  # m: the ball the tip marker sits on.

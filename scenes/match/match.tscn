@@ -1,5 +1,5 @@
-; lint-ignore: scene-too-big (the match composes eighteen leaves; the HUD and ball-in-hand input are each one single-purpose scene)
-[gd_scene load_steps=15 format=3]
+; lint-ignore: scene-too-big,composer-doing-work (the match is the composer for twenty leaves and forwards view hand-offs)
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scenes/match/match.gd" id="1_match"]
 [ext_resource type="PackedScene" path="res://scenes/table/table.tscn" id="2_table"]
@@ -13,6 +13,9 @@
 [ext_resource type="PackedScene" path="res://scenes/input/ball_in_hand_input/ball_in_hand_input.tscn" id="11_bih"]
 [ext_resource type="PackedScene" path="res://scenes/hud/hud.tscn" id="12_hud"]
 [ext_resource type="PackedScene" path="res://scenes/hud/hud_wiring/hud_wiring.tscn" id="13_wiring"]
+[ext_resource type="PackedScene" path="res://scenes/camera_rig/camera_rig.tscn" id="14_rig"]
+[ext_resource type="PackedScene" path="res://scenes/match/aim_view/aim_view.tscn" id="15_aim"]
+[ext_resource type="PackedScene" path="res://scenes/match/view_hud/view_hud.tscn" id="16_hud"]
 
 [sub_resource type="ProceduralSky" id="Sky_1"]
 
@@ -30,8 +33,7 @@ environment = SubResource("Env_1")
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 3, 0)
 
-[node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.6287, 0.7773, 0, -0.7773, 0.6287, 1.27, 1.9, 0.9)
+[node name="CameraRig" parent="." instance=ExtResource("14_rig")]
 
 [node name="Table" parent="." instance=ExtResource("2_table")]
 
@@ -44,7 +46,6 @@ transform = Transform3D(1, 0, 0, 0, 0.6287, 0.7773, 0, -0.7773, 0.6287, 1.27, 1.
 [node name="Shooter2" parent="." instance=ExtResource("5_shooter")]
 
 [node name="BallInHandInput" parent="." instance=ExtResource("11_bih")]
-camera = NodePath("../Camera")
 
 [node name="Rules" parent="." instance=ExtResource("6_rules")]
 
@@ -54,5 +55,9 @@ camera = NodePath("../Camera")
 
 [node name="Hud" parent="." instance=ExtResource("12_hud")]
 process_mode = 3
+
+[node name="AimView" parent="." instance=ExtResource("15_aim")]
+
+[node name="ViewHud" parent="." instance=ExtResource("16_hud")]
 
 [node name="HudWiring" parent="." instance=ExtResource("13_wiring")]
