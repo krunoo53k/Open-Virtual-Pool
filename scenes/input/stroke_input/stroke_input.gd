@@ -92,7 +92,10 @@ func is_charging() -> bool:
 	return _charging and not _fired
 
 func get_pull_m() -> float:
-	return _pulled
+	# The view draws the cue's CURRENT position, not the furthest point of
+	# the backswing (that maximum is only the run length for the power).
+	# With zero draw the tip sits on the ball, before and after a stroke.
+	return _draw
 
 func get_speed_m_s() -> float:
 	return _speed

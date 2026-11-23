@@ -17,6 +17,7 @@ func _ready() -> void:
 	var line: MeshInstance3D = game.get_node("AimView/AimPreview/GhostLine")
 	var hud = game.get_node("ViewHud")
 	var rig = game.get_node("CameraRig")
+	game.get_node("ShotPlayback").time_scale = 100.0  # keep this harness quick
 	_check(cue.visible, "cue is visible while aiming")
 	_check(line.visible, "the adapter's aim line is visible")
 	var before: Transform3D = cue.transform
@@ -42,6 +43,16 @@ func _ready() -> void:
 		await get_tree().process_frame
 		guard += 1
 	_check(not game.get_node("AimView/CueStick").visible, "the cue hides once the shot is away")
+	var settle := 0
+	while game.get_phase() != "AwaitingShot" and settle < 300:
+		if game.get_phase() == "BallInHand":
+			PlacementHelper.place_cue(game.get_node("BallInHandInput"),
+				game.get_node("Simulation").layout, game.rack)
+		await get_tree().process_frame
+		settle += 1
+	_check(game.get_phase() == "AwaitingShot", "the flow settles back to aiming")
+	_check(AimStateReader.read(shooter).pull_m == 0.0,
+		"the cue returns to the same spot against the ball")
 
 	_check(InputMap.has_action("debug_toggle") and InputMap.has_action("camera_toggle"),
 		"the view toggles are bound to InputMap actions")
