@@ -65,16 +65,18 @@ func _on_phase(phase: String, player: int) -> void:
 		shooter.set_process_unhandled_input(phase == "AwaitingShot")
 	if ball_in_hand_input != null and phase != "BallInHand":
 		ball_in_hand_input.deactivate()
+	# The replay only belongs to the roll. Every other phase shows the live
+	# rack: ball-in-hand places against the current layout, never against the
+	# last shot's frozen positions, and game over keeps the settled table.
+	var show_rack := phase == "AwaitingShot" or phase == "BallInHand" or phase == "GameOver"
+	rack_view.visible = show_rack
+	playback.visible = not show_rack
 	match phase:
 		"AwaitingShot":
-			rack_view.visible = true
-			playback.visible = false
 			turn_changed.emit(player)
 		"Striking":
 			_shot = simulation.resolve(_params, rack)
 			_outcome = simulation.outcome_of(_shot)
-			rack_view.visible = false
-			playback.visible = true
 			playback.play(_shot, rack)
 			flow.go_to("Rolling")
 		"Judging":

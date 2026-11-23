@@ -118,16 +118,21 @@ func _script(foul: bool, events: Array[ShotEvent]) -> void:
 func _play(called: int) -> void:
 	var params := ShotParams.new()
 	params.called_pocket = called
+	var rack_at_strike: int = $Match.rack.numbers.size()
 	$Match.take_shot(params)
 	var guard := 0
 	while $Match.get_phase() != "AwaitingShot" and $Match.get_phase() != "GameOver":
 		if $Match.get_phase() == "BallInHand":
+			_check($Match/BallRack.visible and not $Match/ShotPlayback.visible,
+				"ball-in-hand shows the live rack, not the last shot's stale positions")
 			PlacementHelper.place_cue($Match/BallInHandInput, $Match/Simulation.layout, $Match.rack)
 		await get_tree().process_frame
 		guard += 1
 		if guard > 900:
 			_fail("flow stalled in " + $Match.get_phase())
 			return
+	_check($Match/ShotPlayback.get_child_count() == rack_at_strike,
+		"each shot replaces the replay's balls instead of stacking old positions")
 
 
 func _on_turn(player: int) -> void:

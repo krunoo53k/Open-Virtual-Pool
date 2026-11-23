@@ -27,7 +27,7 @@ func play(path: PoolShot, rack: RackState) -> void:
 	_duration = path.get_duration()
 	_clock = 0.0
 	_fired = false
-	_balls.clear()
+	_clear_balls()
 	for i in rack.numbers.size():
 		# number and radius first: the ball paints on entry to the tree.
 		var ball := BALL_SCENE.instantiate()
@@ -47,6 +47,16 @@ func step(delta_seconds: float) -> void:
 	if _clock >= _duration and not _fired:
 		_fired = true
 		path_finished.emit(_path)
+
+
+func _clear_balls() -> void:
+	# A new trace replaces the last one outright. Clearing the array alone
+	# would leave the previous shot's instances on the cloth at their final
+	# positions, so every old ball leaves the tree before the new set arrives.
+	for ball in _balls:
+		remove_child(ball)
+		ball.queue_free()
+	_balls.clear()
 
 
 func is_finished() -> bool:
