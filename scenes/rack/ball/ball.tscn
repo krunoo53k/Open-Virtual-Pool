@@ -1,23 +1,76 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=35 format=3]
 
 [ext_resource type="Script" path="res://scenes/rack/ball/ball.gd" id="1_ball"]
+[ext_resource type="Mesh" path="res://assets/models/ball_sphere.obj" id="2_sphere"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_00.png" id="t00"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_01.png" id="t01"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_02.png" id="t02"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_03.png" id="t03"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_04.png" id="t04"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_05.png" id="t05"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_06.png" id="t06"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_07.png" id="t07"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_08.png" id="t08"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_09.png" id="t09"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_10.png" id="t10"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_11.png" id="t11"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_12.png" id="t12"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_13.png" id="t13"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_14.png" id="t14"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_15.png" id="t15"]
 
-[sub_resource type="SphereMesh" id="SphereBase"]
-radius = 1.0
-height = 2.0
-radial_segments = 32
-rings = 16
-
-[sub_resource type="CylinderMesh" id="StripeBand"]
-top_radius = 1.01
-bottom_radius = 1.01
-height = 1.2
+[sub_resource type="StandardMaterial3D" id="M00"]
+albedo_texture = ExtResource("t00")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M01"]
+albedo_texture = ExtResource("t01")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M02"]
+albedo_texture = ExtResource("t02")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M03"]
+albedo_texture = ExtResource("t03")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M04"]
+albedo_texture = ExtResource("t04")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M05"]
+albedo_texture = ExtResource("t05")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M06"]
+albedo_texture = ExtResource("t06")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M07"]
+albedo_texture = ExtResource("t07")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M08"]
+albedo_texture = ExtResource("t08")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M09"]
+albedo_texture = ExtResource("t09")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M10"]
+albedo_texture = ExtResource("t10")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M11"]
+albedo_texture = ExtResource("t11")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M12"]
+albedo_texture = ExtResource("t12")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M13"]
+albedo_texture = ExtResource("t13")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M14"]
+albedo_texture = ExtResource("t14")
+roughness = 0.18
+[sub_resource type="StandardMaterial3D" id="M15"]
+albedo_texture = ExtResource("t15")
+roughness = 0.18
 
 [node name="Ball" type="Node3D"]
 script = ExtResource("1_ball")
+ball_materials = Array[Material]([SubResource("M00"), SubResource("M01"), SubResource("M02"), SubResource("M03"), SubResource("M04"), SubResource("M05"), SubResource("M06"), SubResource("M07"), SubResource("M08"), SubResource("M09"), SubResource("M10"), SubResource("M11"), SubResource("M12"), SubResource("M13"), SubResource("M14"), SubResource("M15")])
 
 [node name="Base" type="MeshInstance3D" parent="."]
-mesh = SubResource("SphereBase")
-
-[node name="Stripe" type="MeshInstance3D" parent="."]
-mesh = SubResource("StripeBand")
+mesh = ExtResource("2_sphere")

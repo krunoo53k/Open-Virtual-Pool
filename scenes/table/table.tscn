@@ -1,32 +1,61 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/table/set_rails/set_rails.tscn" id="1_set_rails"]
 [ext_resource type="PackedScene" path="res://scenes/table/set_cushions/set_cushions.tscn" id="2_set_cush"]
 [ext_resource type="PackedScene" path="res://scenes/table/set_pockets/set_pockets.tscn" id="3_set_pock"]
+[ext_resource type="Mesh" path="res://assets/models/cloth_with_holes.obj" id="4_cloth_mesh"]
+[ext_resource type="Mesh" path="res://assets/models/slate_with_holes.obj" id="5_slate_mesh"]
+[ext_resource type="Mesh" path="res://assets/models/table_frame.obj" id="6_frame_mesh"]
+[ext_resource type="Texture2D" path="res://assets/textures/felt.png" id="7_felt"]
+[ext_resource type="Texture2D" path="res://assets/textures/wood.png" id="8_wood"]
+[ext_resource type="Mesh" path="res://assets/models/pocket_funnels.obj" id="10_funnel_mesh"]
+[ext_resource type="Mesh" path="res://assets/models/pocket_facings.obj" id="11_facing_mesh"]
+[ext_resource type="Texture2D" path="res://assets/textures/pocket_dark.png" id="13_dark_tex"]
+[ext_resource type="Texture2D" path="res://assets/textures/leather.png" id="14_leather_tex"]
 
 [sub_resource type="StandardMaterial3D" id="ClothMat"]
-albedo_color = Color(0.05, 0.31, 0.24, 1)
+albedo_texture = ExtResource("7_felt")
+roughness = 0.95
 
 [sub_resource type="StandardMaterial3D" id="SlateMat"]
-albedo_color = Color(0.13, 0.13, 0.14, 1)
+albedo_color = Color(0.015, 0.015, 0.018, 1)
+roughness = 0.8
 
-[sub_resource type="BoxMesh" id="ClothBox"]
-size = Vector3(2.5400000, 0.02, 1.2700000)
+[sub_resource type="StandardMaterial3D" id="WoodMat"]
+albedo_texture = ExtResource("8_wood")
+roughness = 0.42
 
-[sub_resource type="BoxMesh" id="SlateBox"]
-size = Vector3(2.6600000, 0.14, 1.3900000)
+[sub_resource type="StandardMaterial3D" id="FunnelMat"]
+albedo_texture = ExtResource("13_dark_tex")
+albedo_color = Color(0.02, 0.02, 0.02, 1)
+shading_mode = 2
+cull_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="FacingMat"]
+albedo_texture = ExtResource("14_leather_tex")
+roughness = 0.85
 
 [node name="Table" type="Node3D"]
 
-[node name="Cloth" parent="." type="MeshInstance3D"]
-transform = Transform3D(1.0000000,0.0000000,0.0000000,0.0000000,1.0000000,0.0000000,0.0000000,0.0000000,1.0000000,1.2700000,-0.0100000,-0.6350000)
-mesh = SubResource("ClothBox")
+[node name="Cloth" type="MeshInstance3D" parent="."]
+mesh = ExtResource("4_cloth_mesh")
 material_override = SubResource("ClothMat")
 
-[node name="SlateFrame" parent="." type="MeshInstance3D"]
-transform = Transform3D(1.0000000,0.0000000,0.0000000,0.0000000,1.0000000,0.0000000,0.0000000,0.0000000,1.0000000,1.2700000,-0.0900000,-0.6350000)
-mesh = SubResource("SlateBox")
+[node name="SlateFrame" type="MeshInstance3D" parent="."]
+mesh = ExtResource("5_slate_mesh")
 material_override = SubResource("SlateMat")
+
+[node name="Frame" type="MeshInstance3D" parent="."]
+mesh = ExtResource("6_frame_mesh")
+material_override = SubResource("WoodMat")
+
+[node name="ThroatMeshes" type="MeshInstance3D" parent="."]
+mesh = ExtResource("10_funnel_mesh")
+material_override = SubResource("FunnelMat")
+
+[node name="LeatherFacings" type="MeshInstance3D" parent="."]
+mesh = ExtResource("11_facing_mesh")
+material_override = SubResource("FacingMat")
 
 [node name="SetRails" parent="." instance=ExtResource("1_set_rails")]
 

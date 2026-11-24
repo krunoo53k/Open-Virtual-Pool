@@ -1,17 +1,24 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/table/rail_frame/rail_frame.tscn" id="1_rail"]
+[ext_resource type="PackedScene" path="res://scenes/table/rail_frame_split/rail_frame_split.tscn" id="2_split"]
+
+; Wooden rails are offset outward from the cushion noses. In the original scene
+; the rail box and the cushion box shared both a top face and an inner face,
+; which z-fought along the whole length. These transforms keep the four Rail*
+; nodes and their counts; only the decorative wood moves, never the cushions
+; the physics pins.
 
 [node name="SetRails" type="Node3D"]
 
-[node name="RailBottom" parent="." instance=ExtResource("1_rail")]
-transform = Transform3D(2.6600000,0.0000000,0.0000000,0.0000000,0.0513000,0.0000000,0.0000000,0.0000000,0.0600000,1.2700000,0.0256500,0.0300000)
+[node name="RailBottom" parent="." instance=ExtResource("2_split")]
+transform = Transform3D(2.6600000,0.0000000,0.0000000,0.0000000,0.0513000,0.0000000,0.0000000,0.0000000,0.0600000,1.2700000,0.0256500,0.0800000)
 
-[node name="RailTop" parent="." instance=ExtResource("1_rail")]
-transform = Transform3D(2.6600000,0.0000000,0.0000000,0.0000000,0.0513000,0.0000000,0.0000000,0.0000000,0.0600000,1.2700000,0.0256500,-1.3000000)
+[node name="RailTop" parent="." instance=ExtResource("2_split")]
+transform = Transform3D(2.6600000,0.0000000,0.0000000,0.0000000,0.0513000,0.0000000,0.0000000,0.0000000,0.0600000,1.2700000,0.0256500,-1.3500000)
 
 [node name="RailLeft" parent="." instance=ExtResource("1_rail")]
-transform = Transform3D(0.0600000,0.0000000,0.0000000,0.0000000,0.0513000,0.0000000,0.0000000,0.0000000,1.3900000,-0.0300000,0.0256500,-0.6350000)
+transform = Transform3D(0.0600000,0.0000000,0.0000000,0.0000000,0.0513000,0.0000000,0.0000000,0.0000000,1.3900000,-0.0800000,0.0256500,-0.6350000)
 
 [node name="RailRight" parent="." instance=ExtResource("1_rail")]
-transform = Transform3D(0.0600000,0.0000000,0.0000000,0.0000000,0.0513000,0.0000000,0.0000000,0.0000000,1.3900000,2.5700000,0.0256500,-0.6350000)
+transform = Transform3D(0.0600000,0.0000000,0.0000000,0.0000000,0.0513000,0.0000000,0.0000000,0.0000000,1.3900000,2.6200000,0.0256500,-0.6350000)
