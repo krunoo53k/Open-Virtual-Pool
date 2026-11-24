@@ -2,9 +2,16 @@
 
 [ext_resource type="Script" path="res://scenes/version_stamp/version_stamp.gd" id="1_vs"]
 
-[node name="VersionStamp" type="Node3D"]
+[node name="VersionStamp" type="CanvasLayer"]
 script = ExtResource("1_vs")
 
-[node name="Label" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+[node name="Label" type="Label" parent="."]
 text = "core model ?"
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -190.0
+offset_top = -28.0
+offset_right = -10.0
+offset_bottom = -8.0

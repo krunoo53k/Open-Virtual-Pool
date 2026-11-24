@@ -72,6 +72,36 @@ its caption directly underneath:
 <p align="center"><em>Title screen — Play, Options, Quit.</em></p>
 ```
 
+## Art assets
+
+The table cloth and slate (with the six pocket openings cut through), black
+pocket throats with thin leather facings, a walnut rail/frame with the long
+rails split at the side pockets, the ball sphere and all 21 textures are
+generated in Blender from the same geometry numbers `TableLayout` carries.
+The pocket openings are also cut through the decorative apron so nothing shows
+through the throat. The hole sizes come from the pocket region, not from a
+photograph: a corner hole is centred on the drop point with a radius equal to
+the 44.45 mm shelf depth, so its near edge is the mouth line and its centre is
+the drop line — a ball looks over the hole exactly when it is in the pocket
+region, and disappears when the core drops it. Side pockets have a 6.35 mm
+shelf, so their jaw-tip half-width at the mouth centre is already honest.
+The wooden rails are offset outward from the cushion noses:
+originally both boxes shared a top and an inner face, which z-fought along every
+rail. The cushions themselves keep the core's exact positions and spans. The source scene
+and generator live in `tools/blender/`:
+
+```sh
+blender -b --python tools/blender/build_pool_assets.py
+godot --headless --path . --import
+```
+
+`.blend` source lives under `tools/blender/`, whose `.gdignore` keeps Godot
+from trying to import it.
+The generated `.obj` meshes, `.png` textures and their `.import` sidecars are
+committed, so headless runs need no Blender install. The spec-pinned rail,
+cushion, pocket and jaw node names and transforms in `scenes/table/` are
+unchanged — only their meshes and materials were replaced.
+
 ## Layout
 
 - `project.godot` — Godot 4.7, Forward+; the extension targets api-4.6

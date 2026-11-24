@@ -1,4 +1,4 @@
-extends Node3D
+extends CanvasLayer
 
 ## Displays the physics model version the bridge reports.
 ##

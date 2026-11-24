@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Mesh" path="res://assets/models/rail_frame_split.obj" id="1_mesh"]
+[ext_resource type="Texture2D" path="res://assets/textures/wood.png" id="2_wood"]
+
+[sub_resource type="StandardMaterial3D" id="WoodMat"]
+albedo_texture = ExtResource("2_wood")
+roughness = 0.42
+
+[node name="RailFrameSplit" type="Node3D"]
+
+[node name="Wood" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_mesh")
+material_override = SubResource("WoodMat")
