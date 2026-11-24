@@ -7,7 +7,8 @@ extends RefCounted
 ## exception: a scratch respots it, so it stays in the rack. No scene here
 ## simulates anything.
 
-static func after_shot(shot: PoolShot, removed: Array[int], rack: RackState) -> void:
+static func after_shot(shot: PoolShot, removed: Array[int], rack: RackState,
+		layout: TableLayout) -> void:
 	var final: Dictionary = shot.get_final_state()
 	var balls: Array = final["balls"]
 	var spun = shot.sample_rotation(shot.get_duration())
@@ -18,11 +19,17 @@ static func after_shot(shot: PoolShot, removed: Array[int], rack: RackState) -> 
 		var ball: Dictionary = balls[i]
 		var number := int(ball["number"])
 		if number != 0 and removed.has(number):
-			# A scratched cue is respotted, never removed: dropping it here
-			# would make the core strike whichever object ball took index 0.
 			continue
 		numbers.append(number)
-		positions.append(ball["position"])
+		if number == 0 and removed.has(0):
+			# A scratched cue is respotted, never left where the core froze it:
+			# a ball taken out of play off the table can stop in mid-air.
+			positions.append(head_spot(layout))
+			rotations.append(Vector3.ZERO)
+			continue
+		var position: Vector3 = ball["position"]
+		# A ball still resting on the cloth rests at exactly one radius.
+		positions.append(Vector3(position.x, layout.ball_radius, position.z))
 		rotations.append(spun[i] if i < spun.size() else Vector3.ZERO)
 	rack.numbers = numbers
 	rack.positions = positions

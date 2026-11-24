@@ -86,7 +86,7 @@ func _on_phase(phase: String, player: int) -> void:
 			flow.go_to("Rolling")
 		"Judging":
 			var ruling := MatchJudge.judge_and_apply(rules, simulation,
-				_shot, _outcome, _params, state, rack, rack_view)
+				_shot, _outcome, _params, state, rack, rack_view, simulation.layout)
 			judgement_made.emit(ruling)
 			if ruling.game_over:
 				_winner = ruling.winner
