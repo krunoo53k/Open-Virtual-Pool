@@ -80,8 +80,9 @@ produced the bug. It is pretty-printed JSON with:
 - `events` — the core's events in order, in ball-number terms.
 
 Paste that file when reporting a bugged shot: the params plus `rack_before`
-replay the same core call, and the hash says whether it reproduced. The bind is
-checked headlessly with:
+replay the same core call, and the hash says whether it reproduced. Floats are
+written at full precision so the hash is byte-exact. The bind is checked
+headlessly with:
 
 ```sh
 godot --headless --path . res://tools/shot_log_test.tscn
