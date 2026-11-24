@@ -27,7 +27,9 @@ func dump() -> String:
 	if file == null:
 		push_warning("shot log: could not open " + path)
 		return ""
-	file.store_string(JSON.stringify(_last.to_dict(), "  "))
+	# Full precision: the hash is byte-exact, so a shortened float would make
+	# a replay disagree with the shot the player actually saw.
+	file.store_string(JSON.stringify(_last.to_dict(), "  ", false, true))
 	file.close()
 	var absolute := ProjectSettings.globalize_path(path)
 	print("shot log saved: ", absolute)

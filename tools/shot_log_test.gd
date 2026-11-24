@@ -18,7 +18,8 @@ func _ready() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(logger.path))
 	var params := ShotParams.new()
 	params.speed = 7.5
-	params.level_aim_deg = 90.0
+	# A double that Godot's default float formatting shortens: the log must not.
+	params.level_aim_deg = 0.1801463961601262
 	game.take_shot(params)
 	for _i in range(10):
 		await get_tree().process_frame
@@ -30,6 +31,7 @@ func _ready() -> void:
 	await get_tree().process_frame
 	_check(FileAccess.file_exists(logger.path), "the bind wrote the log file")
 	if FileAccess.file_exists(logger.path):
+		_check_full_precision(logger.path)
 		_check_json(logger.path, params)
 	print("shot log: ", _fails, " failed assertions")
 	get_tree().quit(_fails)
@@ -40,6 +42,13 @@ func _press_bind() -> void:
 	event.action = "dump_shot_log"
 	event.pressed = true
 	Input.parse_input_event(event)
+
+
+func _check_full_precision(file_path: String) -> void:
+	var file := FileAccess.open(file_path, FileAccess.READ)
+	var text := file.get_as_text()
+	file.close()
+	_check(text.contains("0.1801463961601262"), "floats keep full precision")
 
 
 func _check_json(file_path: String, params: ShotParams) -> void:
