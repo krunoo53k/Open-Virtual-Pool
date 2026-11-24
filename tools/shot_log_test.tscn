@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://tools/shot_log_test.gd" id="1_test"]
+[ext_resource type="PackedScene" path="res://scenes/match/match.tscn" id="2_match"]
+
+[node name="ShotLogTest" type="Node3D"]
+script = ExtResource("1_test")
+
+[node name="Match" parent="." instance=ExtResource("2_match")]
