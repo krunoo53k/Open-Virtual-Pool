@@ -8,7 +8,7 @@ extends RefCounted
 
 static func judge_and_apply(rules: EightBallRules, simulation: PoolSimulation,
 		shot: PoolShot, outcome: ShotOutcome, params: ShotParams, state: MatchState,
-		rack: RackState, rack_view: BallRack) -> Judgement:
+		rack: RackState, rack_view: BallRack, layout: TableLayout) -> Judgement:
 	var ruling: Judgement = rules.judge_and_announce(outcome, params,
 		simulation.events_of(shot, rack), state)
 	var removed := outcome.pocketed.duplicate()
@@ -18,6 +18,6 @@ static func judge_and_apply(rules: EightBallRules, simulation: PoolSimulation,
 		# a re-rack starts from the rack's seeded layout, not the shot's final frame
 		RackModel.rerack(rack_view, rack)
 	else:
-		RackModel.after_shot(shot, removed, rack)
+		RackModel.after_shot(shot, removed, rack, layout)
 	BallRackView.apply_state(rack_view, rack)
 	return ruling
