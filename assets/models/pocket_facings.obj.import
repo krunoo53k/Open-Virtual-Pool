@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://b20s82ptomcuv"
+path="res://.godot/imported/pocket_facings.obj-4cad2551a946dc879dee8b7f55896502.mesh"
+
+[deps]
+
+files=["res://.godot/imported/pocket_facings.obj-4cad2551a946dc879dee8b7f55896502.mesh"]
+
+source_file="res://assets/models/pocket_facings.obj"
+dest_files=["res://.godot/imported/pocket_facings.obj-4cad2551a946dc879dee8b7f55896502.mesh", "res://.godot/imported/pocket_facings.obj-4cad2551a946dc879dee8b7f55896502.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
