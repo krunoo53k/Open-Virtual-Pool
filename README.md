@@ -30,6 +30,20 @@ godot --headless --path . scenes/smoke.tscn
 The `VersionStamp` scene prints and shows `PoolCore.get_model_version` (1.8) on
 any running screen, so the loaded extension can be identified while playing.
 
+## Self-play smoke
+
+Drive one full eight-ball game with both seats controlled by the same scripted
+policy through the public `take_shot` entry — real physics, rules, rack and turn
+flow; only shot selection is scripted:
+
+```sh
+godot --headless --path . res://tools/self_play.tscn
+```
+
+It prints a shot-by-shot transcript and saves it to
+`user://self_play_transcript.txt`. Exit 0 means the match reached a winner with
+no harness failure.
+
 ## Run the menu
 
 `scenes/main_menu/main_menu.tscn` is the configured main scene: plain
