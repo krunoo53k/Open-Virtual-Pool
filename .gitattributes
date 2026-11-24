@@ -1,0 +1,7 @@
+# Generated Blender meshes: huge, machine-written vertex lists. Collapse them
+# in GitHub diffs and keep them out of the language stats.
+assets/models/*.obj  linguist-generated=true -diff
+
+# Binary assets.
+assets/textures/*.png binary
+tools/blender/*.blend binary
