@@ -61,6 +61,32 @@ godot --headless --path . res://tools/main_menu_test.tscn
 godot --headless --path . res://tools/menu_quit_test.tscn
 ```
 
+## Debug: last-shot log
+
+During a match, press **L** to write the last resolved shot to
+`user://last_shot.json`. Godot prints the full path to stdout (on Linux:
+`~/.local/share/godot/app_userdata/Open Virtual Pool/last_shot.json`). Each
+press overwrites the file with the most recent shot.
+
+The snapshot is taken the moment the core resolves the stroke, before the rack
+is folded forward to its final frame, so it holds the layout that actually
+produced the bug. It is pretty-printed JSON with:
+
+- `model_version` and `player` — which bridge and shooter were live;
+- `params` — the exact stroke: speed, aim, elevation, tip offset, called pocket;
+- `rack_before` — every ball's number, position and rotation before the shot;
+- `shot` — the core's `hash` (the determinism pin) and path duration;
+- `outcome` — phase, elapsed time, foul/miscue, pocketed and off-table balls, error;
+- `events` — the core's events in order, in ball-number terms.
+
+Paste that file when reporting a bugged shot: the params plus `rack_before`
+replay the same core call, and the hash says whether it reproduced. The bind is
+checked headlessly with:
+
+```sh
+godot --headless --path . res://tools/shot_log_test.tscn
+```
+
 ## Screenshots
 
 No screenshot assets are committed yet, so none are embedded. Follow-up:

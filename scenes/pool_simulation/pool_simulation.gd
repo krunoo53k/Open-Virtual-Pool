@@ -90,6 +90,11 @@ func ghost_of(params: ShotParams, rack: RackState) -> ShotGhost:
 	var preview := preview_of(params)
 	return DisplayRay.stretch_of(rack, preview, layout)
 
+## The loaded bridge's model version, so a shot log says which core ran it.
+func model_version() -> float:
+	return float(core.get_model_version())
+
+
 ## How far the tip may leave the centre before the shot miscues (§6.3).
 ## The human shooter's english gesture clamps its drag to this disc;
 ## the number is the core's, so the limit stays the same everywhere.

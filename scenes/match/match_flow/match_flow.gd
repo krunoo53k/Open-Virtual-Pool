@@ -8,6 +8,7 @@ class_name MatchFlow
 signal turn_changed(player: int)
 signal match_finished(winner: int)
 signal judgement_made(ruling: Judgement)
+signal shot_resolved(log: ShotLog)
 
 @export var flow: TurnFlow
 @export var rules: EightBallRules
@@ -77,6 +78,10 @@ func _on_phase(phase: String, player: int) -> void:
 		"Striking":
 			_shot = simulation.resolve(_params, rack)
 			_outcome = simulation.outcome_of(_shot)
+			# Snapshot while the rack is still the one the core was handed:
+			# the ruling folds it forward into the final frame moments later.
+			shot_resolved.emit(ShotLog.capture(simulation, _params, rack,
+				_shot, _outcome, simulation.events_of(_shot, rack), player))
 			playback.play(_shot, rack)
 			flow.go_to("Rolling")
 		"Judging":

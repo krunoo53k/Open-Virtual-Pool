@@ -14,6 +14,7 @@ const DEFAULTS := {
 	"fine_trim": KEY_F,
 	"debug_toggle": KEY_D,
 	"camera_toggle": KEY_C,
+	"dump_shot_log": KEY_L,
 	"cancel": KEY_ESCAPE,
 }
 

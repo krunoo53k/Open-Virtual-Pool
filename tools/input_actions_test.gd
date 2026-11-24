@@ -10,8 +10,8 @@ func _ready() -> void:
 	add_child((load("res://scenes/camera_rig/camera_rig.tscn") as PackedScene).instantiate())
 	add_child((load("res://scenes/input/cancel_input/cancel_input.tscn") as PackedScene).instantiate())
 	add_child((load("res://scenes/match/view_hud/view_hud.tscn") as PackedScene).instantiate())
-	for action in ["camera_toggle", "cancel", "debug_toggle", "cue_draw",
-			"cue_raise", "english_hold", "fine_trim"]:
+	for action in ["camera_toggle", "cancel", "debug_toggle", "dump_shot_log",
+			"cue_draw", "cue_raise", "english_hold", "fine_trim"]:
 		_check(InputMap.has_action(action), action + " is registered")
 	print("input actions: ", _fails, " failed assertions")
 	get_tree().quit(_fails)

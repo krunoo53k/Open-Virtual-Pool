@@ -46,6 +46,8 @@ func _ready() -> void:
 	sequence.turn_changed.connect(_on_turn_changed)
 	sequence.match_finished.connect(match_finished.emit)
 	sequence.judgement_made.connect($HudWiring.on_judgement)
+	sequence.shot_resolved.connect($ShotDebugLog.capture)
+	$ShotLogInput.log_requested.connect($ShotDebugLog.dump)
 	$BallInHandInput.cue_ball_placed.connect(sequence.apply_cue_placement)
 	$HudWiring.wire($Hud, $Rules, state)
 	$HudWiring.pocket_called.connect(func(index: int): _called_pocket = index)
