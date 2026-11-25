@@ -23,7 +23,7 @@ func _ready() -> void:
 		splash.hide_splash()
 	if screen == "options":
 		menu.show_options()
-	elif screen == "match" or screen == "pause":
+	elif screen == "match" or screen == "pause" or screen == "result":
 		menu.hide()
 		$FeltBackdrop.show()
 		var hud := (load(HUD) as PackedScene).instantiate()
@@ -31,6 +31,11 @@ func _ready() -> void:
 		hud.show_state(_state())
 		if screen == "pause":
 			hud.toggle_pause()
+		elif screen == "result":
+			var ruling := Judgement.new()
+			ruling.game_over = true
+			ruling.winner = 1
+			hud.show_judgement(ruling)
 
 	for i in range(8):
 		await get_tree().process_frame

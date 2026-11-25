@@ -152,6 +152,12 @@ godot --path . --display-driver x11 --rendering-driver vulkan --fullscreen \
 <p align="center"><img src="docs/screenshots/match_1080p.png" alt="Match HUD" width="640"></p>
 <p align="center"><em>Match HUD — turn status and the ball tracker, with four balls potted.</em></p>
 
+<p align="center"><img src="docs/screenshots/result_1080p.png" alt="Result banner" width="640"></p>
+<p align="center"><em>Game over — centred result panel with a Back to main menu button.</em></p>
+
+The result panel's button emits the same menu intent as the pause menu;
+`tools/result_banner_test.tscn` pins its text, backdrop and intent headlessly.
+
 ## Art assets
 
 The table cloth and slate (with the six pocket openings cut through), black

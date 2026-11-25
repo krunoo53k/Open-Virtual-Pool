@@ -25,6 +25,7 @@ func show_state(state: MatchState) -> void:
 
 func show_judgement(ruling: Judgement) -> void:
 	_result_banner.show_result(ruling.winner if ruling.game_over else 0)
+	$ResultBackdrop.visible = ruling.game_over
 	if ruling.foul_reason == "":
 		_foul_banner.show_reason("")
 

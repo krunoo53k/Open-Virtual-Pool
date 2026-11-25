@@ -31,6 +31,10 @@ func _ready() -> void:
 	var state := MatchState.new()
 	state.remaining = PackedInt32Array([1, 2, 4, 5, 8, 9, 10, 12, 14])
 	hud.show_state(state)
+	var win := Judgement.new()
+	win.game_over = true
+	win.winner = 1
+	hud.show_judgement(win)
 	await get_tree().process_frame
 	await get_tree().process_frame
 
@@ -38,7 +42,7 @@ func _ready() -> void:
 		"TitleButtons/Menu/PlayButton", "OptionsPanel/Panel", "BootSplash"]:
 		_bounds(menu, path)
 	for path in ["TurnStatus", "BallTracker", "FoulBanner", "ResultBanner",
-		"CalledPocketPicker", "PauseMenu"]:
+		"ResultBackdrop", "CalledPocketPicker", "PauseMenu"]:
 		_bounds(hud, path)
 	if hud.get_node_or_null("VersionStamp") == null:
 		_fail("version stamp missing")
