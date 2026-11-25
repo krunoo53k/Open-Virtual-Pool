@@ -19,6 +19,7 @@ signal cue_ball_placed(position: Vector3)
 var _active := false
 var _last_spot := Vector3.ZERO
 var _last_legal := false
+var _pointer := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -30,6 +31,7 @@ func activate() -> void:
 	_active = true
 	_last_spot = RackModel.head_spot(layout) if layout != null else Vector3.ZERO
 	_last_legal = false
+	_pointer = get_viewport().get_visible_rect().size * 0.5
 	_show_marker()
 	set_process_unhandled_input(true)
 
@@ -71,7 +73,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not _active:
 		return
 	if event is InputEventMouseMotion and Input.is_action_pressed("ball_in_hand"):
-		_track_pointer(event.position)
+		_track_pointer(_pointer_position(event))
+
+
+## A grabbed cursor reports only relative motion, so follow it with a virtual
+## pointer. With a free cursor the event's own screen position is the truth.
+func _pointer_position(event: InputEventMouseMotion) -> Vector2:
+	if Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
+		return event.position
+	if event.relative != Vector2.ZERO:
+		var size := get_viewport().get_visible_rect().size
+		_pointer = (_pointer + event.relative).clamp(Vector2.ZERO, size)
+	return _pointer
 
 
 func _track_pointer(screen: Vector2) -> void:

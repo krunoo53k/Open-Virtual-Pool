@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/input/cursor_grab/cursor_grab.gd" id="1_grab"]
+
+[node name="CursorGrab" type="Node"]
+script = ExtResource("1_grab")

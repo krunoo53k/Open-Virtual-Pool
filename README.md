@@ -86,6 +86,11 @@ The mouse turns the shot line, **F** fine-trims the turn, **E** holds English,
 **S** draws the cue and shoots when it comes home, **B** raises the butt,
 **C** switches camera, **L** dumps the last shot and **Escape** pauses.
 
+During a match the game grabs the cursor, so turning the aim keeps working
+past the window edge instead of stopping at the border. The pointer is handed
+back for the pause menu and the result screen. With the cursor grabbed, the
+ball-in-hand drag follows a virtual pointer from the screen centre.
+
 ## Debug: last-shot log
 
 During a match, press **L** to write the last resolved shot to

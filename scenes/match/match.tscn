@@ -1,5 +1,5 @@
 ; lint-ignore: scene-too-big,composer-doing-work (the match is the composer for twenty leaves and forwards view hand-offs)
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://scenes/match/match.gd" id="1_match"]
 [ext_resource type="PackedScene" path="res://scenes/table/table.tscn" id="2_table"]
@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" path="res://scenes/match/view_hud/view_hud.tscn" id="16_hud"]
 [ext_resource type="PackedScene" path="res://scenes/input/shot_log_input/shot_log_input.tscn" id="17_log_input"]
 [ext_resource type="PackedScene" path="res://scenes/match/shot_debug_log/shot_debug_log.tscn" id="18_logger"]
+[ext_resource type="PackedScene" path="res://scenes/input/cursor_grab/cursor_grab.tscn" id="19_grab"]
 
 [sub_resource type="ProceduralSky" id="Sky_1"]
 
@@ -67,3 +68,5 @@ process_mode = 3
 [node name="ShotLogInput" parent="." instance=ExtResource("17_log_input")]
 
 [node name="ShotDebugLog" parent="." instance=ExtResource("18_logger")]
+
+[node name="CursorGrab" parent="." instance=ExtResource("19_grab")]

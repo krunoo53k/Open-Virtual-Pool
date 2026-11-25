@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://tools/cursor_grab_test.gd" id="1_test"]
+[ext_resource type="PackedScene" path="res://scenes/input/cursor_grab/cursor_grab.tscn" id="2_grab"]
+
+[node name="CursorGrabTest" type="Node3D"]
+script = ExtResource("1_test")
+
+[node name="Leaf" parent="." instance=ExtResource("2_grab")]
