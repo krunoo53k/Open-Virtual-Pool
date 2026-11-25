@@ -9,7 +9,9 @@ script = ExtResource("1_foul")
 [node name="Row" type="HBoxContainer" parent="."]
 
 [node name="Caption" type="Label" parent="Row"]
+theme_type_variation = &"Heading"
 text = "FOUL"
 
 [node name="ReasonLabel" type="Label" parent="Row"]
+theme_type_variation = &"Status"
 text = ""

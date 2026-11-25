@@ -6,6 +6,7 @@
 script = ExtResource("1_vs")
 
 [node name="Label" type="Label" parent="."]
+theme_type_variation = &"Caption"
 text = "core model ?"
 anchor_left = 1.0
 anchor_top = 1.0

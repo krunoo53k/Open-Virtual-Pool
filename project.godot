@@ -14,3 +14,14 @@ config/name="Open Virtual Pool"
 config/description="A deterministic 8-ball pool game on the virtual pool physics core."
 run/main_scene="res://scenes/main_menu/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+
+[gui]
+
+theme/custom="res://resources/ui_theme.theme"

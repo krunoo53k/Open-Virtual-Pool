@@ -7,4 +7,5 @@ visible = false
 script = ExtResource("1_result")
 
 [node name="WinnerLabel" type="Label" parent="."]
+theme_type_variation = &"Heading"
 text = ""

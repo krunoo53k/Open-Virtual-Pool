@@ -15,9 +15,11 @@ signal menu_requested()
 @onready var _result_banner: ResultBanner = $ResultBanner
 @onready var _picker: CalledPocketPicker = $CalledPocketPicker
 @onready var _pause: PauseMenu = $PauseMenu
+@onready var _balls: BallTracker = $BallTracker
 
 func show_state(state: MatchState) -> void:
 	_turn_status.show_state(state)
+	_balls.show_state(state)
 	_picker.visible = _shoots_for_eight(state)
 
 
