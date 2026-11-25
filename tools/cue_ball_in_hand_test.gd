@@ -22,7 +22,9 @@ func _ready() -> void:
 	scratch.pocketed.append(0)
 	var drop: Array[ShotEvent] = [_ev("pocket-drop", 0, 0, 0.9)]
 	$Match/Simulation.script_next(scratch, drop)
-	$Match.take_shot(ShotParams.new())
+	# Fire this one through the real shooter: a direct take_shot leaves the
+	# shooter's settling flag clear and hides the stuck-look regression.
+	await _stroke()
 	await _settle()
 	await _run()
 
@@ -93,6 +95,13 @@ func _relative(relative: Vector2) -> void:
 	Input.parse_input_event(motion)
 	await get_tree().process_frame
 	await get_tree().process_frame
+
+
+func _stroke() -> void:
+	await _key(KEY_S, true)
+	await _relative(Vector2(0.0, 200.0))
+	await _relative(Vector2(0.0, -200.0))
+	await _key(KEY_S, false)
 
 
 func _key(keycode: int, pressed: bool) -> void:
