@@ -14,16 +14,15 @@ class_name HumanShooter
 @export var core: PoolSimulation = null
 
 signal shot_committed(params: ShotParams)
+# The draw key starts the stroke; ball-in-hand locks its cue spot right then.
+signal stroke_started()
 # Views call get_view_state() on this signal; display only, no rules.
 signal aim_state_changed()
-
-var tuning: CueTuning = CueTuning.new()
 
 var _shot_taken := false
 
 func _ready() -> void:
-	InputActions.register_defaults()
-	$EnglishInput.core = core
+	InputActions.register_defaults(); $EnglishInput.core = core
 	$CancelInput.cancel_requested.connect(_on_cancel_requested); $StrokeInput.stroke_released.connect(_on_stroke_released)
 	AimViewSignals.wire(self)
 
@@ -76,6 +75,7 @@ func _route_key(event: InputEvent) -> void:
 		# The cue is drawn back: the shot is on when the cue comes back
 		# to the ball, so the key never has to be let go of.
 		_shot_taken = false
+		stroke_started.emit()
 		$StrokeInput.start_stroke()
 	elif event.is_action_released(&"cue_draw") and $StrokeInput.is_charging():
 		$StrokeInput.cancel_stroke()

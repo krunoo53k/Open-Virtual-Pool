@@ -77,10 +77,15 @@ godot --headless --path . res://tools/menu_quit_test.tscn
 
 ## Controls
 
-Hold **M** and move the mouse to place the cue ball after a foul. Releasing M
-stops the drag, but the spot is not locked in until the shot: the ball can be
-moved again while lining up the stroke. A scripted `place_at` still commits
-immediately, so AI and netcode callers keep the old contract.
+After a foul, hold **M** and move the mouse to place the cue ball. The scheme
+depends on the eye: from the table camera the pointer ray lands on the cloth;
+from the cue camera a fixed-rate, camera-relative drag replaces the ray (the
+grazing angle made it far too sensitive). Releasing M stops the drag but does
+not lock the spot: in the cue view the mouse then turns the aim and the camera
+orbits around the ball. Press M again and rotation is locked while the ball is
+moved. Pressing **S** locks the spot and starts the stroke, even if the stroke
+is later cancelled. A scripted `place_at` still commits immediately, so AI and
+netcode callers keep the old contract.
 
 The mouse turns the shot line, **F** fine-trims the turn, **E** holds English,
 **S** draws the cue and shoots when it comes home, **B** raises the butt,
