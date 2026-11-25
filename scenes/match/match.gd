@@ -51,6 +51,7 @@ func _ready() -> void:
 	$BallInHandInput.cue_placement_preview.connect(sequence.preview_cue_placement)
 	$BallInHandInput.cue_ball_placed.connect(sequence.apply_cue_placement)
 	$HudWiring.wire($Hud, $Rules, state)
+	$HudWiring.pause_changed.connect($CursorGrab.set_ui_open)
 	$HudWiring.pocket_called.connect(func(index: int): _called_pocket = index)
 	sequence.begin()
 
@@ -95,6 +96,7 @@ func _wire_views(layout: TableLayout, sim: PoolSimulation) -> void:
 		$CameraRig.follow_aim($AimView.get_cue_position(), state.level_aim_deg))
 	$TurnFlow.player_activated.connect(_on_player_activated)
 	$TurnFlow.phase_entered.connect(_on_phase_view)
+	$TurnFlow.phase_entered.connect($CursorGrab.set_phase)
 
 
 func _on_camera_changed(cam: Camera3D) -> void:

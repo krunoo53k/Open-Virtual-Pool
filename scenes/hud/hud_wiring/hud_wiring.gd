@@ -6,6 +6,7 @@ extends Node
 ## pocket call. Rules and phase transitions still live in the match flow.
 
 signal pocket_called(index: int)
+signal pause_changed(open: bool)
 
 const MENU_SCENE := "res://scenes/main_menu/main_menu.tscn"
 
@@ -37,8 +38,10 @@ func _on_pause_intent(intent: String) -> void:
 	if intent == "toggle":
 		_hud.toggle_pause()
 		get_tree().paused = _hud.is_pause_open()
+		pause_changed.emit(_hud.is_pause_open())
 		return
 	get_tree().paused = false
+	pause_changed.emit(false)
 	if intent == "resume":
 		_hud.toggle_pause()
 	elif intent == "restart":
