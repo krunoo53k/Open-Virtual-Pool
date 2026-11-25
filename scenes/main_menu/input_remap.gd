@@ -10,6 +10,7 @@ const KEY_CODES := {
 	"S": KEY_S,
 	"F": KEY_F,
 	"E": KEY_E,
+	"M": KEY_M,
 	"B": KEY_B,
 	"D": KEY_D,
 	"C": KEY_C,
@@ -18,7 +19,7 @@ const KEY_CODES := {
 	"W": KEY_W,
 	"Space": KEY_SPACE,
 }
-const KEY_LABELS := ["S", "F", "E", "B", "D", "C", "Escape", "A", "W", "Space"]
+const KEY_LABELS := ["S", "F", "E", "M", "B", "D", "C", "Escape", "A", "W", "Space"]
 
 
 static func label_for_action(action: String) -> String:

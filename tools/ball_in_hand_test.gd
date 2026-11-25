@@ -32,7 +32,7 @@ func _run() -> void:
 	_check(input.is_active(), "input live only in BallInHand")
 	_check(_active_by_phase.has("BallInHand:true"), "phase entry enabled input")
 	_check(_active_by_phase.has("AwaitingShot:false"), "other phases keep it idle")
-	_check(not $Match/Shooter1.is_processing_unhandled_input(), "shooters gated off during ball-in-hand")
+	_check($Match/Shooter1.is_processing_unhandled_input(), "shooters stay live so the player can aim with the cue in hand")
 	_check(game.rack.numbers[0] == 0, "cue survives the scratch at index 0")
 
 	var before := PackedVector3Array(game.rack.positions)

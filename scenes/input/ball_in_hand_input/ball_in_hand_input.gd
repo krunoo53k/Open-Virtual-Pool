@@ -2,9 +2,13 @@ extends Node3D
 class_name BallInHandInput
 
 ## Ball-in-hand gesture. It owns one ghost marker and the pointer-to-cloth ray;
-## it never starts a stroke. The composer supplies layout, rack and camera,
-## enables it only in BallInHand, and listens for the placed position.
+## it never starts a stroke. Holding M drags the cue around and each legal
+## spot is previewed, but nothing is placed for the shot until the player
+## shoots - the cue can still be moved right up to that moment. The composer
+## supplies layout, rack and camera, enables the gesture in BallInHand, and
+## listens for the preview and the scripted placement.
 
+signal cue_placement_preview(position: Vector3)
 signal cue_ball_placed(position: Vector3)
 
 @export var camera: Camera3D
@@ -18,6 +22,7 @@ var _last_legal := false
 
 
 func _ready() -> void:
+	InputActions.register_defaults()
 	deactivate()
 
 
@@ -25,10 +30,6 @@ func activate() -> void:
 	_active = true
 	_last_spot = RackModel.head_spot(layout) if layout != null else Vector3.ZERO
 	_last_legal = false
-	# The first click may arrive before any motion is reported, so put the
-	# ghost under the pointer now instead of leaving it on the head spot.
-	if camera != null and layout != null:
-		_track_pointer(get_viewport().get_mouse_position())
 	_show_marker()
 	set_process_unhandled_input(true)
 
@@ -47,8 +48,13 @@ func is_last_legal() -> bool:
 	return _last_legal
 
 
-## The public entry a click, an AI or a netcode peer calls. Returns whether
-## the spot was accepted; every caller goes through this one legality check.
+## The spot the ghost is showing, for a shot that is being committed now.
+func get_pending_spot() -> Vector3:
+	return _last_spot
+
+
+## The public entry a scripted player, an AI or a netcode peer calls. Returns
+## whether the spot was accepted; every caller goes through this one check.
 func place_at(position: Vector3) -> bool:
 	if not _active or layout == null:
 		return false
@@ -64,10 +70,8 @@ func place_at(position: Vector3) -> bool:
 func _unhandled_input(event: InputEvent) -> void:
 	if not _active:
 		return
-	if event is InputEventMouseMotion:
+	if event is InputEventMouseMotion and Input.is_action_pressed("ball_in_hand"):
 		_track_pointer(event.position)
-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		place_at(_last_spot)
 
 
 func _track_pointer(screen: Vector2) -> void:
@@ -80,9 +84,12 @@ func _track_pointer(screen: Vector2) -> void:
 	var travel := (layout.ball_radius - origin.y) / direction.y
 	if travel <= 0.0:
 		return
+	var previous := _last_spot
 	_last_spot = origin + direction * travel
 	_last_legal = CuePlacement.is_legal(_last_spot, layout, rack, tolerance)
 	_show_marker()
+	if _last_legal and _last_spot != previous:
+		cue_placement_preview.emit(_last_spot)
 
 
 func _show_marker() -> void:

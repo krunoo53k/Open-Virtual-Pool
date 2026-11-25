@@ -40,8 +40,16 @@ func begin() -> void:
 
 
 func take_shot(params: ShotParams) -> void:
-	if not flow.is_awaiting_shot():
+	var phase := flow.get_phase()
+	if phase != "AwaitingShot" and phase != "BallInHand":
 		return
+	if phase == "BallInHand" and ball_in_hand_input != null:
+		# The player may have kept moving the cue with M right up to the
+		# stroke: this is the first moment any spot is committed.
+		if ball_in_hand_input.is_last_legal():
+			apply_cue_placement(ball_in_hand_input.get_pending_spot(), false)
+		else:
+			ball_in_hand_input.deactivate()
 	_params = params
 	state.ball_in_hand = false
 	flow.go_to("Striking")
@@ -60,10 +68,11 @@ func get_winner() -> int:
 
 
 func _on_phase(phase: String, player: int) -> void:
-	# Only AwaitingShot accepts a stroke: a key held during a roll or a
-	# placement would otherwise charge a shot the guard silently drops.
+	# A foul grant leaves the player aiming with the cue still in hand, so
+	# AwaitingShot and BallInHand both accept a stroke. A roll or the end of
+	# the match must not charge one that the guard would silently drop.
 	for shooter in _shooters:
-		shooter.set_process_unhandled_input(phase == "AwaitingShot")
+		shooter.set_process_unhandled_input(phase == "AwaitingShot" or phase == "BallInHand")
 	if ball_in_hand_input != null and phase != "BallInHand":
 		ball_in_hand_input.deactivate()
 	# The replay only belongs to the roll. Every other phase shows the live
@@ -101,21 +110,33 @@ func _on_phase(phase: String, player: int) -> void:
 				ball_in_hand_input.activate()
 
 
-## The placement scene's public event: fold the chosen spot into the rack and
-## resume the incoming player. The input never starts the shot flow itself.
-func apply_cue_placement(position: Vector3) -> void:
-	if flow.get_phase() != "BallInHand":
+## A legal spot under the held pointer: show the cue there, but leave the
+## phase and the gesture alone so the player can keep moving until the shot.
+func preview_cue_placement(position: Vector3) -> void:
+	if flow.get_phase() != "BallInHand" or not _cue_spot_is_legal(position):
 		return
-	# place_at already checked this, but re-check at the writing end so any
-	# other emitter of the signal cannot fold an illegal spot into the rack.
-	if ball_in_hand_input != null and not CuePlacement.is_legal(position,
-			ball_in_hand_input.layout, rack, ball_in_hand_input.tolerance):
+	RackModel.respot_cue(rack, position)
+	BallRackView.place_cue(rack_view, position)
+
+
+## The scripted placement entry: fold the chosen spot into the rack and resume
+## the incoming player. A human stroke commits its own spot in take_shot.
+func apply_cue_placement(position: Vector3, resume: bool = true) -> void:
+	if flow.get_phase() != "BallInHand" or not _cue_spot_is_legal(position):
 		return
 	RackModel.respot_cue(rack, position)
 	BallRackView.place_cue(rack_view, position)
 	if ball_in_hand_input != null:
 		ball_in_hand_input.deactivate()
-	flow.activate(state.player)
+	if resume:
+		flow.activate(state.player)
+
+
+# place_at and the preview already check this, but re-check at the writing end
+# so any other emitter cannot fold an illegal spot into the rack.
+func _cue_spot_is_legal(position: Vector3) -> bool:
+	return ball_in_hand_input != null and CuePlacement.is_legal(position,
+			ball_in_hand_input.layout, rack, ball_in_hand_input.tolerance)
 
 
 func _on_path_finished(_path) -> void:

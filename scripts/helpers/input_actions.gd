@@ -11,6 +11,7 @@ const DEFAULTS := {
 	"cue_draw": KEY_S,
 	"cue_raise": KEY_B,
 	"english_hold": KEY_E,
+	"ball_in_hand": KEY_M,
 	"fine_trim": KEY_F,
 	"debug_toggle": KEY_D,
 	"camera_toggle": KEY_C,
