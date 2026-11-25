@@ -7,6 +7,12 @@ visible = false
 script = ExtResource("1_pause")
 
 [node name="Choices" type="VBoxContainer" parent="."]
+theme_override_constants/separation = 12
+
+[node name="Heading" type="Label" parent="Choices"]
+theme_type_variation = &"Heading"
+text = "PAUSED"
+horizontal_alignment = 1
 
 [node name="Resume" type="Button" parent="Choices"]
 text = "Resume"

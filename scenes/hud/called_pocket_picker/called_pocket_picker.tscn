@@ -9,6 +9,7 @@ script = ExtResource("1_picker")
 [node name="Rows" type="VBoxContainer" parent="."]
 
 [node name="Caption" type="Label" parent="Rows"]
+theme_type_variation = &"Caption"
 text = "call the 8 - left/right selects, enter confirms"
 
 [node name="Pockets" type="HBoxContainer" parent="Rows"]
@@ -32,4 +33,5 @@ text = "LS"
 text = "RS"
 
 [node name="SelectionLabel" type="Label" parent="Rows"]
+theme_type_variation = &"Status"
 text = "called: TL (0)"

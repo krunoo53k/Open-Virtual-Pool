@@ -1,0 +1,109 @@
+; lint-ignore: scene-too-big (fifteen flat ball-token leaves are the deliberate display grid)
+[gd_scene load_steps=19 format=3]
+
+[ext_resource type="Script" path="res://scenes/hud/ball_tracker/ball_tracker.gd" id="1_tracker"]
+[ext_resource type="PackedScene" path="res://scenes/hud/ball_tracker/ball_token.tscn" id="2_token"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_00.png" id="t00"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_01.png" id="t01"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_02.png" id="t02"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_03.png" id="t03"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_04.png" id="t04"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_05.png" id="t05"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_06.png" id="t06"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_07.png" id="t07"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_08.png" id="t08"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_09.png" id="t09"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_10.png" id="t10"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_11.png" id="t11"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_12.png" id="t12"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_13.png" id="t13"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_14.png" id="t14"]
+[ext_resource type="Texture2D" path="res://assets/textures/ball_15.png" id="t15"]
+
+[node name="BallTracker" type="PanelContainer"]
+custom_minimum_size = Vector2(340, 0)
+script = ExtResource("1_tracker")
+ball_textures = Array[Texture2D]([ExtResource("t00"), ExtResource("t01"), ExtResource("t02"), ExtResource("t03"), ExtResource("t04"), ExtResource("t05"), ExtResource("t06"), ExtResource("t07"), ExtResource("t08"), ExtResource("t09"), ExtResource("t10"), ExtResource("t11"), ExtResource("t12"), ExtResource("t13"), ExtResource("t14"), ExtResource("t15")])
+
+[node name="Margin" type="MarginContainer" parent="."]
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+theme_override_constants/separation = 7
+
+[node name="Heading" type="Label" parent="Margin/VBox"]
+theme_type_variation = &"Caption"
+text = "OBJECT BALLS · DIMMED = POTTED"
+horizontal_alignment = 1
+
+[node name="SolidsRow" type="HBoxContainer" parent="Margin/VBox"]
+theme_override_constants/separation = 4
+
+[node name="RowLabel" type="Label" parent="Margin/VBox/SolidsRow"]
+theme_type_variation = &"Caption"
+custom_minimum_size = Vector2(52, 0)
+text = "SOLIDS"
+
+[node name="Ball1" parent="Margin/VBox/SolidsRow" instance=ExtResource("2_token")]
+ball_number = 1
+
+[node name="Ball2" parent="Margin/VBox/SolidsRow" instance=ExtResource("2_token")]
+ball_number = 2
+
+[node name="Ball3" parent="Margin/VBox/SolidsRow" instance=ExtResource("2_token")]
+ball_number = 3
+
+[node name="Ball4" parent="Margin/VBox/SolidsRow" instance=ExtResource("2_token")]
+ball_number = 4
+
+[node name="Ball5" parent="Margin/VBox/SolidsRow" instance=ExtResource("2_token")]
+ball_number = 5
+
+[node name="Ball6" parent="Margin/VBox/SolidsRow" instance=ExtResource("2_token")]
+ball_number = 6
+
+[node name="Ball7" parent="Margin/VBox/SolidsRow" instance=ExtResource("2_token")]
+ball_number = 7
+
+[node name="EightRow" type="HBoxContainer" parent="Margin/VBox"]
+theme_override_constants/separation = 4
+
+[node name="RowLabel" type="Label" parent="Margin/VBox/EightRow"]
+theme_type_variation = &"Caption"
+custom_minimum_size = Vector2(52, 0)
+text = "EIGHT"
+
+[node name="Ball8" parent="Margin/VBox/EightRow" instance=ExtResource("2_token")]
+ball_number = 8
+
+[node name="StripesRow" type="HBoxContainer" parent="Margin/VBox"]
+theme_override_constants/separation = 4
+
+[node name="RowLabel" type="Label" parent="Margin/VBox/StripesRow"]
+theme_type_variation = &"Caption"
+custom_minimum_size = Vector2(52, 0)
+text = "STRIPES"
+
+[node name="Ball9" parent="Margin/VBox/StripesRow" instance=ExtResource("2_token")]
+ball_number = 9
+
+[node name="Ball10" parent="Margin/VBox/StripesRow" instance=ExtResource("2_token")]
+ball_number = 10
+
+[node name="Ball11" parent="Margin/VBox/StripesRow" instance=ExtResource("2_token")]
+ball_number = 11
+
+[node name="Ball12" parent="Margin/VBox/StripesRow" instance=ExtResource("2_token")]
+ball_number = 12
+
+[node name="Ball13" parent="Margin/VBox/StripesRow" instance=ExtResource("2_token")]
+ball_number = 13
+
+[node name="Ball14" parent="Margin/VBox/StripesRow" instance=ExtResource("2_token")]
+ball_number = 14
+
+[node name="Ball15" parent="Margin/VBox/StripesRow" instance=ExtResource("2_token")]
+ball_number = 15

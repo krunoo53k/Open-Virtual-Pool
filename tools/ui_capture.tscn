@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://tools/ui_capture.gd" id="1_capture"]
+
+[node name="UiCapture" type="Node"]
+script = ExtResource("1_capture")
+
+[node name="FeltBackdrop" type="ColorRect" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.04, 0.14, 0.1, 1)

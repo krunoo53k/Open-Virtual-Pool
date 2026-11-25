@@ -6,5 +6,28 @@
 visible = false
 script = ExtResource("1_result")
 
-[node name="WinnerLabel" type="Label" parent="."]
+[node name="Margin" type="MarginContainer" parent="."]
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 36
+theme_override_constants/margin_bottom = 28
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+theme_override_constants/separation = 16
+
+[node name="Caption" type="Label" parent="Margin/VBox"]
+theme_type_variation = &"Caption"
+text = "MATCH COMPLETE"
+horizontal_alignment = 1
+
+[node name="WinnerLabel" type="Label" parent="Margin/VBox"]
+theme_type_variation = &"Heading"
+theme_override_font_sizes/font_size = 46
 text = ""
+horizontal_alignment = 1
+
+[node name="BackToMenu" type="Button" parent="Margin/VBox"]
+custom_minimum_size = Vector2(280, 0)
+text = "Back to main menu"
+
+[connection signal="pressed" from="Margin/VBox/BackToMenu" to="." method="_on_back_to_menu_pressed"]

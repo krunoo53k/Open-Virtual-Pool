@@ -102,16 +102,61 @@ headlessly with:
 godot --headless --path . res://tools/shot_log_test.tscn
 ```
 
+## UI theme and resolution checks
+
+All `Control` nodes inherit `resources/ui_theme.theme` (set in `project.godot`):
+a vendored Barlow Condensed OFL font (regular + semibold, licence in
+`assets/fonts/OFL.txt`), a walnut/brass/felt palette, and `Title`, `Heading`,
+`Status`, `Caption` and `GroupTag` label variations. Regenerate the theme with
+`godot --headless --path . --script tools/build_ui_theme.gd`. The UI is authored
+at a 1920×1080 reference viewport; `window/stretch/mode = "canvas_items"` with
+`aspect = "keep"` scales it to any 16:9 window. The HUD's ball tracker shows all
+fifteen object balls by group and dims the potted ones from `MatchState.remaining`.
+
+`tools/ui_layout_test.tscn` checks the real menu and HUD for clipping,
+off-screen controls, applied font and potted-ball state. Run it headless at the
+reference size, or on X11 at each target resolution:
+
+```sh
+godot --headless --path . res://tools/ui_layout_test.tscn -- --width=1920 --height=1080
+godot --path . --display-driver x11 --rendering-driver vulkan --windowed --resolution 1920x1080 \
+  res://tools/ui_layout_test.tscn -- --width=1920 --height=1080
+godot --path . --display-driver x11 --rendering-driver vulkan --windowed --resolution 1366x768 \
+  res://tools/ui_layout_test.tscn -- --width=1366 --height=768
+# 1440p is the native fullscreen size here:
+godot --path . --display-driver x11 --rendering-driver vulkan --fullscreen \
+  res://tools/ui_layout_test.tscn -- --width=2560 --height=1440
+```
+
 ## Screenshots
 
-No screenshot assets are committed yet, so none are embedded. Follow-up:
-capture the title screen and the options panel, then centre each image with
-its caption directly underneath:
+`tools/ui_capture.tscn` renders four screens (title, options, match HUD, pause)
+at three resolutions into `docs/screenshots/`. Use the Vulkan renderer — the
+project is Forward+ and OpenGL frames come out blank. Run with an isolated
+`XDG_DATA_HOME` so a saved `fullscreen=true` cannot override the requested
+window size:
 
-```html
-<p align="center"><img src="docs/screenshots/title.png" alt="Title screen" width="640"></p>
-<p align="center"><em>Title screen — Play, Options, Quit.</em></p>
+```sh
+godot --path . --display-driver x11 --rendering-driver vulkan --windowed --resolution 1920x1080 \
+  res://tools/ui_capture.tscn -- --screen=title --out=/abs/path/docs/screenshots/title_1080p.png
+godot --path . --display-driver x11 --rendering-driver vulkan --fullscreen \
+  res://tools/ui_capture.tscn -- --screen=match --fullscreen --out=/abs/path/docs/screenshots/match_1440p.png
 ```
+
+<p align="center"><img src="docs/screenshots/title_1080p.png" alt="Title screen" width="640"></p>
+<p align="center"><em>Title screen — Play, Options, Quit.</em></p>
+
+<p align="center"><img src="docs/screenshots/options_1080p.png" alt="Options panel" width="640"></p>
+<p align="center"><em>Options — display mode and the four rebindable actions.</em></p>
+
+<p align="center"><img src="docs/screenshots/match_1080p.png" alt="Match HUD" width="640"></p>
+<p align="center"><em>Match HUD — turn status and the ball tracker, with four balls potted.</em></p>
+
+<p align="center"><img src="docs/screenshots/result_1080p.png" alt="Result banner" width="640"></p>
+<p align="center"><em>Game over — centred result panel with a Back to main menu button.</em></p>
+
+The result panel's button emits the same menu intent as the pause menu;
+`tools/result_banner_test.tscn` pins its text, backdrop and intent headlessly.
 
 ## Art assets
 
