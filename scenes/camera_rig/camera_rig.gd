@@ -48,6 +48,10 @@ func get_active_camera() -> Camera3D:
 	return $CueCamera if _on_cue else $TableCamera
 
 
+func is_cue_view() -> bool:
+	return _on_cue
+
+
 func refresh_view() -> void:
 	# The composer sets the table centre after this scene enters the tree;
 	# re-lay the active eye once those numbers are real.

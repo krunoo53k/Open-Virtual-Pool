@@ -33,6 +33,7 @@ func bind(match_state: MatchState, rack_state: RackState, shooters: Array[Node])
 	_shooters = shooters
 	flow.phase_entered.connect(_on_phase)
 	playback.path_finished.connect(_on_path_finished)
+	for shooter in _shooters: shooter.stroke_started.connect(lock_ball_in_hand)
 
 
 func begin() -> void:
@@ -40,19 +41,26 @@ func begin() -> void:
 
 
 func take_shot(params: ShotParams) -> void:
-	var phase := flow.get_phase()
-	if phase != "AwaitingShot" and phase != "BallInHand":
+	if flow.get_phase() not in ["AwaitingShot", "BallInHand"]:
 		return
-	if phase == "BallInHand" and ball_in_hand_input != null:
-		# The player may have kept moving the cue with M right up to the
-		# stroke: this is the first moment any spot is committed.
-		if ball_in_hand_input.is_last_legal():
-			apply_cue_placement(ball_in_hand_input.get_pending_spot(), false)
-		else:
-			ball_in_hand_input.deactivate()
+	# A scripted caller may not have pressed the draw key; the guard is
+	# idempotent, so the human's already-locked spot is left alone.
+	lock_ball_in_hand()
 	_params = params
 	state.ball_in_hand = false
 	flow.go_to("Striking")
+
+
+## The draw key locks the cue where it stands: no more moving it, even if the
+## stroke is cancelled later. The turn itself resumes only after the shot.
+func lock_ball_in_hand() -> void:
+	if flow.get_phase() != "BallInHand" or ball_in_hand_input == null \
+			or not ball_in_hand_input.is_active():
+		return
+	if ball_in_hand_input.is_last_legal():
+		apply_cue_placement(ball_in_hand_input.get_pending_spot(), false)
+	else:
+		ball_in_hand_input.deactivate()
 
 
 func get_phase() -> String:
@@ -73,8 +81,7 @@ func _on_phase(phase: String, player: int) -> void:
 	# the match must not charge one that the guard would silently drop.
 	for shooter in _shooters:
 		shooter.set_process_unhandled_input(phase == "AwaitingShot" or phase == "BallInHand")
-	if ball_in_hand_input != null and phase != "BallInHand":
-		ball_in_hand_input.deactivate()
+	if ball_in_hand_input != null and phase != "BallInHand": ball_in_hand_input.deactivate()
 	# The replay only belongs to the roll. Every other phase shows the live
 	# rack: ball-in-hand places against the current layout, never against the
 	# last shot's frozen positions, and game over keeps the settled table.
@@ -128,8 +135,7 @@ func apply_cue_placement(position: Vector3, resume: bool = true) -> void:
 	BallRackView.place_cue(rack_view, position)
 	if ball_in_hand_input != null:
 		ball_in_hand_input.deactivate()
-	if resume:
-		flow.activate(state.player)
+	if resume: flow.activate(state.player)
 
 
 # place_at and the preview already check this, but re-check at the writing end

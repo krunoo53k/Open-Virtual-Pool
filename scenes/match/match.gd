@@ -88,6 +88,7 @@ func _wire_views(layout: TableLayout, sim: PoolSimulation) -> void:
 	$CameraRig.table_centre = Vector3(layout.length * 0.5, 0.0, -layout.width * 0.5)
 	$CameraRig.refresh_view()
 	$BallInHandInput.camera = $CameraRig.get_active_camera()
+	$BallInHandInput.cue_view = $CameraRig.is_cue_view()
 	$CameraRig.camera_changed.connect(_on_camera_changed)
 	$AimView.simulation = sim
 	$AimView.bind(rack)
@@ -101,6 +102,7 @@ func _wire_views(layout: TableLayout, sim: PoolSimulation) -> void:
 
 func _on_camera_changed(cam: Camera3D) -> void:
 	$BallInHandInput.camera = cam
+	$BallInHandInput.cue_view = $CameraRig.is_cue_view()
 
 
 func _on_player_activated(player: int) -> void:

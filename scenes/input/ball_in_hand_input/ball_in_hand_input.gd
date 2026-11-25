@@ -1,12 +1,12 @@
 extends Node3D
 class_name BallInHandInput
 
-## Ball-in-hand gesture. It owns one ghost marker and the pointer-to-cloth ray;
-## it never starts a stroke. Holding M drags the cue around and each legal
-## spot is previewed, but nothing is placed for the shot until the player
-## shoots - the cue can still be moved right up to that moment. The composer
-## supplies layout, rack and camera, enables the gesture in BallInHand, and
-## listens for the preview and the scripted placement.
+## Ball-in-hand gesture. It owns one ghost marker and previews the cue spot;
+## it never starts a stroke. The table eye uses the pointer-to-cloth ray,
+## which is precise from above; the close cue eye would turn a pixel into a
+## metre, so it uses a fixed camera-relative drag instead. Holding M drags the
+## cue and locks camera rotation; with M up the shooter turns the aim and the
+## cue camera orbits. Nothing is locked in until the stroke starts.
 
 signal cue_placement_preview(position: Vector3)
 signal cue_ball_placed(position: Vector3)
@@ -15,9 +15,13 @@ signal cue_ball_placed(position: Vector3)
 @export var layout: TableLayout
 @export var rack: RackState
 @export var tolerance: float = 0.0001
+@export var cue_drag_m_per_px := 0.004
+
+@export var cue_view: bool = false  # set by the composer when the eye changes
 
 var _active := false
 var _last_spot := Vector3.ZERO
+var _last_legal_spot := Vector3.ZERO
 var _last_legal := false
 var _pointer := Vector2.ZERO
 
@@ -30,6 +34,7 @@ func _ready() -> void:
 func activate() -> void:
 	_active = true
 	_last_spot = RackModel.head_spot(layout) if layout != null else Vector3.ZERO
+	_last_legal_spot = _last_spot
 	_last_legal = false
 	_pointer = get_viewport().get_visible_rect().size * 0.5
 	_show_marker()
@@ -65,26 +70,44 @@ func place_at(position: Vector3) -> bool:
 	_show_marker()
 	if not _last_legal:
 		return false
+	_last_legal_spot = _last_spot
 	cue_ball_placed.emit(_last_spot)
 	return true
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not _active:
+	if not _active or not event is InputEventMouseMotion:
 		return
-	if event is InputEventMouseMotion and Input.is_action_pressed("ball_in_hand"):
-		_track_pointer(_pointer_position(event))
+	var motion := event as InputEventMouseMotion
+	if not Input.is_action_pressed("ball_in_hand"):
+		return
+	if cue_view:
+		_track_drag(motion.relative)
+		return
+	var screen := motion.position
+	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		# A grabbed cursor reports only relative motion, so follow it with a
+		# virtual pointer; a free cursor's own screen position is the truth.
+		if motion.relative != Vector2.ZERO:
+			var size := get_viewport().get_visible_rect().size
+			_pointer = (_pointer + motion.relative).clamp(Vector2.ZERO, size)
+		screen = _pointer
+	_track_pointer(screen)
 
 
-## A grabbed cursor reports only relative motion, so follow it with a virtual
-## pointer. With a free cursor the event's own screen position is the truth.
-func _pointer_position(event: InputEventMouseMotion) -> Vector2:
-	if Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
-		return event.position
-	if event.relative != Vector2.ZERO:
-		var size := get_viewport().get_visible_rect().size
-		_pointer = (_pointer + event.relative).clamp(Vector2.ZERO, size)
-	return _pointer
+func _track_drag(relative: Vector2) -> void:
+	if camera == null or layout == null:
+		return
+	var basis := camera.global_transform.basis
+	# Flatten the eye so a screen drag stays a steady walk on the cloth.
+	var forward := Vector3(-basis.z.x, 0.0, -basis.z.z).normalized()
+	var right := Vector3(basis.x.x, 0.0, basis.x.z).normalized()
+	var move := (right * relative.x - forward * relative.y) * cue_drag_m_per_px
+	# Walk from the last legal spot, not from a red ghost over a ball.
+	var spot := _last_legal_spot + move
+	spot.x = clampf(spot.x, layout.ball_radius, layout.length - layout.ball_radius)
+	spot.z = clampf(spot.z, -layout.width + layout.ball_radius, -layout.ball_radius)
+	_accept(spot)
 
 
 func _track_pointer(screen: Vector2) -> void:
@@ -97,12 +120,19 @@ func _track_pointer(screen: Vector2) -> void:
 	var travel := (layout.ball_radius - origin.y) / direction.y
 	if travel <= 0.0:
 		return
-	var previous := _last_spot
-	_last_spot = origin + direction * travel
-	_last_legal = CuePlacement.is_legal(_last_spot, layout, rack, tolerance)
+	_accept(origin + direction * travel)
+
+
+## Both schemes end here: one legality check, one marker, one preview signal.
+func _accept(spot: Vector3) -> void:
+	var previous := _last_legal_spot
+	_last_spot = spot
+	_last_legal = CuePlacement.is_legal(spot, layout, rack, tolerance)
+	if _last_legal:
+		_last_legal_spot = spot
 	_show_marker()
-	if _last_legal and _last_spot != previous:
-		cue_placement_preview.emit(_last_spot)
+	if _last_legal and _last_legal_spot != previous:
+		cue_placement_preview.emit(_last_legal_spot)
 
 
 func _show_marker() -> void:
