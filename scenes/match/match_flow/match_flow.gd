@@ -78,9 +78,12 @@ func get_winner() -> int:
 func _on_phase(phase: String, player: int) -> void:
 	# A foul grant leaves the player aiming with the cue still in hand, so
 	# AwaitingShot and BallInHand both accept a stroke. A roll or the end of
-	# the match must not charge one that the guard would silently drop.
+	# the match must not charge one that the guard would silently drop. The
+	# incoming player must also be re-armed: the shot that fouled left their
+	# shooter in the "settling" state, which would swallow every look drag.
 	for shooter in _shooters:
 		shooter.set_process_unhandled_input(phase == "AwaitingShot" or phase == "BallInHand")
+		if phase == "BallInHand": shooter.rearm_after_the_settle()
 	if ball_in_hand_input != null and phase != "BallInHand": ball_in_hand_input.deactivate()
 	# The replay only belongs to the roll. Every other phase shows the live
 	# rack: ball-in-hand places against the current layout, never against the
@@ -113,8 +116,7 @@ func _on_phase(phase: String, player: int) -> void:
 			else:
 				flow.activate(state.player)
 		"BallInHand":
-			if ball_in_hand_input != null:
-				ball_in_hand_input.activate()
+			if ball_in_hand_input != null: ball_in_hand_input.activate()
 
 
 ## A legal spot under the held pointer: show the cue there, but leave the
