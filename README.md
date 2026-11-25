@@ -75,6 +75,17 @@ godot --headless --path . res://tools/main_menu_test.tscn
 godot --headless --path . res://tools/menu_quit_test.tscn
 ```
 
+## Controls
+
+Hold **M** and move the mouse to place the cue ball after a foul. Releasing M
+stops the drag, but the spot is not locked in until the shot: the ball can be
+moved again while lining up the stroke. A scripted `place_at` still commits
+immediately, so AI and netcode callers keep the old contract.
+
+The mouse turns the shot line, **F** fine-trims the turn, **E** holds English,
+**S** draws the cue and shoots when it comes home, **B** raises the butt,
+**C** switches camera, **L** dumps the last shot and **Escape** pauses.
+
 ## Debug: last-shot log
 
 During a match, press **L** to write the last resolved shot to

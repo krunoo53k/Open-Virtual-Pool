@@ -48,6 +48,7 @@ func _ready() -> void:
 	sequence.judgement_made.connect($HudWiring.on_judgement)
 	sequence.shot_resolved.connect($ShotDebugLog.capture)
 	$ShotLogInput.log_requested.connect($ShotDebugLog.dump)
+	$BallInHandInput.cue_placement_preview.connect(sequence.preview_cue_placement)
 	$BallInHandInput.cue_ball_placed.connect(sequence.apply_cue_placement)
 	$HudWiring.wire($Hud, $Rules, state)
 	$HudWiring.pocket_called.connect(func(index: int): _called_pocket = index)
@@ -105,7 +106,7 @@ func _on_player_activated(player: int) -> void:
 
 
 func _on_phase_view(phase: String, _player: int) -> void:
-	$AimView.set_view_visible(phase == "AwaitingShot" or phase == "Striking")
+	$AimView.set_view_visible(phase == "AwaitingShot" or phase == "BallInHand" or phase == "Striking")
 	$ViewHud.set_phase(phase)
 
 

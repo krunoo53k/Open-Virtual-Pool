@@ -21,8 +21,11 @@ func _process(_delta: float) -> void:
 	if _shooter == null:
 		return
 	var state := AimStateReader.read(_shooter)
-	var signature := "%f|%f|%f|%f|%f|%f" % [state.level_aim_deg, state.elevation_deg,
-		state.english.x, state.english.y, state.pull_m, state.speed_m_s]
+	# The cue itself moves while it is in hand, so include its spot: the cue
+	# stick and the following camera must track the ghost before the shot.
+	var cue := get_cue_position()
+	var signature := "%f|%f|%f|%f|%f|%f|%f|%f" % [state.level_aim_deg, state.elevation_deg,
+		state.english.x, state.english.y, state.pull_m, state.speed_m_s, cue.x, cue.z]
 	if signature != _signature:
 		_signature = signature
 		_refresh()

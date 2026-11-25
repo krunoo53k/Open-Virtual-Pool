@@ -47,7 +47,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_route_key(event)
 
 func _route_mouse(event: InputEventMouseMotion) -> void:
-	if _shot_taken:
+	# Holding M moves the cue ball, so that drag must not turn the shot line.
+	if _shot_taken or Input.is_action_pressed("ball_in_hand"):
 		# The stroke is on: the aim and the tip are the player's last
 		# look, and the mouse only settles their hand. A flick that
 		# takes the stroke is a big, fast drag, and its sideways
