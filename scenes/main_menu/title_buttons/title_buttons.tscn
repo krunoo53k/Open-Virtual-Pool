@@ -65,6 +65,10 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(320, 0)
 text = "Play (hotseat 2P)"
 
+[node name="OnlineButton" type="Button" parent="Menu"]
+custom_minimum_size = Vector2(320, 0)
+text = "Online"
+
 [node name="OptionsButton" type="Button" parent="Menu"]
 custom_minimum_size = Vector2(320, 0)
 text = "Options"
