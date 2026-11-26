@@ -256,9 +256,9 @@ Until then web play uses the server-authoritative remote path.
 ## Compatibility manifest and CI
 
 [`compat/compat.json`](compat/compat.json) pins the revisions this build is
-checked against: `core` `2a778c6`, `protocol` `1`, `model` `1.9`, with `rules`
+checked against: `core` `2a778c672aa3f5c7e21eca4d590bfe11adaee728`, `protocol` `1`, `model` `1.9`, with `rules`
 and `intent` still `null` (pending). **CI verifies this manifest**, then builds
-the engine at rev `2a778c6`, copies `libpool_godot.so` into `bin/`, and runs all
+the engine at rev `2a778c672aa3f5c7e21eca4d590bfe11adaee728`, copies `libpool_godot.so` into `bin/`, and runs all
 headless harnesses under Godot 4.7. One input harness
 (`tools/input_scene_test.tscn`) is known-failing at baseline pending
 input-harness triage; CI runs it in a `continue-on-error` step so the rest of

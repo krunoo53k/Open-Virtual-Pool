@@ -7,7 +7,7 @@ on:
 
 env:
   # Pinned in compat/compat.json; keep both in step when the engine moves.
-  ENGINE_REF: 2a778c6
+  ENGINE_REF: 2a778c672aa3f5c7e21eca4d590bfe11adaee728
   GODOT_VERSION: 4.7.2-stable
   GODOT: /tmp/godot/Godot_v4.7.2-stable_linux.x86_64
 
@@ -36,7 +36,7 @@ jobs:
 
           manifest = json.loads(Path("compat/compat.json").read_text())
           expected = {
-              "core": "2a778c6",
+              "core": "2a778c672aa3f5c7e21eca4d590bfe11adaee728",
               "rules": None,
               "intent": None,
               "protocol": "1",
@@ -63,7 +63,7 @@ jobs:
           fi
           mkdir -p /tmp/godot
           curl -fsSL -o /tmp/godot.zip \
-            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_${GODOT_VERSION}_linux.x86_64.zip"
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
           unzip -o /tmp/godot.zip -d /tmp/godot
           chmod +x "$GODOT"
           "$GODOT" --version
@@ -73,6 +73,13 @@ jobs:
           set -euxo pipefail
           cp engine/target/release/libpool_godot.so bin/
           ls -l bin/libpool_godot.so
+
+      # `.godot/` is gitignored, so a fresh checkout has neither the imported
+      # assets nor the global class cache. Without this pass, scripts fail to
+      # parse, smoke never calls quit(), and the whole job hangs.
+      - name: Import project (generate Godot caches)
+        run: |
+          "$GODOT" --headless --path . --import
 
       - name: Smoke + self-play
         run: |

@@ -8,13 +8,13 @@ online mode. v1 is server-authoritative with a thin, untrusted client.
 
 | Manifest key | Value | Meaning |
 |---|---|---|
-| `core` | `2a778c6` | Engine revision, branch `fix/clippy-warnings`. |
+| `core` | `2a778c672aa3f5c7e21eca4d590bfe11adaee728` | Engine revision, branch `fix/clippy-warnings`. |
 | `rules` | `null` | No pinned rules crate revision yet — pending. |
 | `intent` | `null` | No pinned intent crate revision yet — pending. |
 | `protocol` | `1` | Online protocol doc revision; §13 is the threat model. |
 | `model` | `1.9` | Model version reported by the loaded engine, not the stale README line. |
 
-At engine rev `2a778c6` there is **no** `simulate_from_intent_f64`, **no** engine
+At engine rev `2a778c672aa3f5c7e21eca4d590bfe11adaee728` there is **no** `simulate_from_intent_f64`, **no** engine
 canary API, **no** engine-exposed Rust judge, and **no** `pool-intent` /
 `pool-rules` crates. The client must not call entry points that are not there;
 the seams below are written against their future arrival.
@@ -97,7 +97,7 @@ from the wire, never on the caller's locals.
 ## CI and further reading
 
 `.github/workflows/ci.yml` checks `compat/compat.json`, builds the engine
-extension at rev `2a778c6`, copies the binary into `bin/`, and runs every
+extension at rev `2a778c672aa3f5c7e21eca4d590bfe11adaee728`, copies the binary into `bin/`, and runs every
 headless harness. One input harness (`tools/input_scene_test.tscn`) is
 known-failing at baseline and is isolated with `continue-on-error` (see the
 README). Trust details live in
