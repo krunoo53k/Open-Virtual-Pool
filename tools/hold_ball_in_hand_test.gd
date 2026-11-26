@@ -48,7 +48,7 @@ func _run() -> void:
 	var first := PlacementHelper.clean_spot(layout, game.rack)
 	flow.preview_cue_placement(first)
 	await get_tree().process_frame
-	_check(game.rack.positions[0].distance_to(first) < 0.0001, "a preview moves the model cue")
+	_check(game.rack.get_position(0).distance_to(first) < 0.0001, "a preview moves the model cue")
 	_check($Match/BallRack.get_child(0).position.distance_to(first) < 0.0001, "a preview moves the visible cue")
 	_check(game.get_phase() == "BallInHand" and input.is_active(), "a preview leaves the cue in hand")
 	_check(_placed_emits == 0, "a preview locks no placement in")
@@ -56,7 +56,7 @@ func _run() -> void:
 	var second := _other_spot(layout, game.rack, first)
 	flow.preview_cue_placement(second)
 	await get_tree().process_frame
-	_check(game.rack.positions[0].distance_to(second) < 0.0001, "the cue can be moved again before the shot")
+	_check(game.rack.get_position(0).distance_to(second) < 0.0001, "the cue can be moved again before the shot")
 	_check(_placed_emits == 0, "moving again still locks nothing in")
 
 	var clean: Array[ShotEvent] = [_ev("ball-ball", 0, 1, 0.3), _ev("cushion", 1, 2, 0.5)]
@@ -67,7 +67,7 @@ func _run() -> void:
 	_check(not input.is_active(), "the shot releases the gesture")
 	# The core may roll the cue a little during the stroke; it must still have
 	# started from the last spot previewed, not from the head spot.
-	_check(game.rack.positions[0].distance_to(second) < 0.2, "the last previewed spot is the one shot")
+	_check(game.rack.get_position(0).distance_to(second) < 0.2, "the last previewed spot is the one shot")
 	_check(game.get_phase() == "AwaitingShot", "the turn resumes after the roll")
 	print("hold ball-in-hand: ", _fails, " failed assertions")
 	get_tree().quit(_fails)

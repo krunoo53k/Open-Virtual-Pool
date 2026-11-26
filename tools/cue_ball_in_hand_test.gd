@@ -37,14 +37,14 @@ func _run() -> void:
 	_check($Match/CameraRig.is_cue_view(), "the cue eye is live")
 	_check(input.camera == camera, "ball-in-hand uses the cue eye")
 
-	var start: Vector3 = game.rack.positions[0]
+	var start: Vector3 = game.rack.get_position(0)
 	var facing := camera.global_rotation
 	Input.action_press("ball_in_hand")
 	# Headless stretches synthetic motion by 30x; a small injection lands in
 	# the same place as an ordinary short drag in a real window.
 	await _relative(Vector2(1.5, 0.0))
 	await _relative(Vector2(0.0, -1.5))
-	var moved: Vector3 = game.rack.positions[0]
+	var moved: Vector3 = game.rack.get_position(0)
 	var delta := moved.distance_to(start)
 	_check(delta > 0.05 and delta < 0.5, "a cue-eye drag moves the ball at a fixed, small rate")
 	_check(camera.global_rotation.distance_to(facing) < 0.0001, "holding M locks the camera rotation")
@@ -53,22 +53,22 @@ func _run() -> void:
 	facing = camera.global_rotation
 	await _relative(Vector2(2.0, 0.0))
 	_check(camera.global_rotation.distance_to(facing) > 0.001, "releasing M turns the camera around the ball")
-	_check(game.rack.positions[0].distance_to(moved) < 0.0001, "looking around does not move the ball")
+	_check(game.rack.get_position(0).distance_to(moved) < 0.0001, "looking around does not move the ball")
 
 	Input.action_press("ball_in_hand")
 	facing = camera.global_rotation
 	await _relative(Vector2(2.0, 0.0))
 	_check(camera.global_rotation.distance_to(facing) < 0.0001, "pressing M again locks rotation")
-	moved = game.rack.positions[0]
+	moved = game.rack.get_position(0)
 
 	await _key(KEY_S, true)
 	_check(not input.is_active(), "the draw key locks the spot")
-	_check(game.rack.positions[0].distance_to(moved) < 0.0001, "the locked spot is the last preview")
+	_check(game.rack.get_position(0).distance_to(moved) < 0.0001, "the locked spot is the last preview")
 	await _key(KEY_S, false)
 	await _key(KEY_ESCAPE, true)
 	await _key(KEY_ESCAPE, false)
 	await _relative(Vector2(3.0, 0.0))
-	_check(game.rack.positions[0].distance_to(moved) < 0.0001, "cancelling the stroke keeps the spot locked")
+	_check(game.rack.get_position(0).distance_to(moved) < 0.0001, "cancelling the stroke keeps the spot locked")
 	print("cue ball-in-hand: ", _fails, " failed assertions")
 	get_tree().quit(_fails)
 
