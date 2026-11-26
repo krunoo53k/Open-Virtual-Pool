@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3]
+
+
+[ext_resource type="Script" path="res://scenes/online/online_match/online_match.gd" id="1_online"]
+
+[node name="OnlineMatch" type="Node3D"]
+script = ExtResource("1_online")
+
+[node name="OnlineStatus" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="PanelContainer" parent="OnlineStatus"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 360.0
+offset_bottom = 146.0
+
+[node name="List" type="VBoxContainer" parent="OnlineStatus/Panel"]
+
+[node name="Status" type="Label" parent="OnlineStatus/Panel/List"]
+text = "waiting for ROOM_STATE"
+
+[node name="Peer" type="Label" parent="OnlineStatus/Panel/List"]
+text = "peer: -"
+
+[node name="Rtt" type="Label" parent="OnlineStatus/Panel/List"]
+text = "RTT: -"
+
+[node name="Clock" type="Label" parent="OnlineStatus/Panel/List"]
+text = "time: -"
+
+[node name="Reconcile" type="Label" parent="OnlineStatus/Panel/List"]
+text = "hash: agreed"
