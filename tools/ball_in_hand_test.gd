@@ -35,23 +35,24 @@ func _run() -> void:
 	_check($Match/Shooter1.is_processing_unhandled_input(), "shooters stay live so the player can aim with the cue in hand")
 	_check(game.rack.numbers[0] == 0, "cue survives the scratch at index 0")
 
-	var before := PackedVector3Array(game.rack.positions)
+	# RackState keeps flat core-frame triples; compare in Godot's frame.
+	var before := RackState.display_from_flat(game.rack.positions)
 	var ball := $Match/BallRack.get_child(0) as Ball
 	var visible_before := ball.position
-	var other_before: Vector3 = game.rack.positions[1]
-	var cluster: Vector3 = game.rack.positions[1]
+	var other_before: Vector3 = game.rack.get_position(1)
+	var cluster: Vector3 = game.rack.get_position(1)
 	_check(not input.place_at(cluster), "cluster spot rejected")
 	_check(_emits == 0, "rejection emits no placement")
 	_check(not input.is_last_legal(), "marker reports illegal")
-	_check(game.rack.positions == before, "rejection leaves the rack unchanged")
+	_check(RackState.display_from_flat(game.rack.positions) == before, "rejection leaves the rack unchanged")
 	_check(ball.position == visible_before, "rejection leaves the ball unchanged")
 
 	var spot := PlacementHelper.clean_spot(layout, game.rack)
 	_check(CuePlacement.is_legal(spot, layout, game.rack), "chosen spot is clear")
 	_check(input.place_at(spot), "clean spot accepted")
 	_check(_emits == 1, "placement emitted once")
-	_check(game.rack.positions[0].distance_to(spot) < 0.0001, "model cue moved")
-	_check(game.rack.positions[1].distance_to(other_before) < 0.0001, "ball 1 untouched by placement")
+	_check(game.rack.get_position(0).distance_to(spot) < 0.0001, "model cue moved")
+	_check(game.rack.get_position(1).distance_to(other_before) < 0.0001, "ball 1 untouched by placement")
 	_check(ball.position.distance_to(spot) < 0.0001, "visible cue moved")
 	_check(not input.is_active(), "input deactivated after placement")
 	_check($Match/Shooter1.is_processing_unhandled_input(), "shooters re-enabled after placement")

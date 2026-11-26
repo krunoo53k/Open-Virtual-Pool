@@ -10,7 +10,7 @@ static func stretch_of(rack: RackState, preview: ShotPreview, layout: TableLayou
 		if rack.numbers[i] == 0:
 			cue_index = i
 			break
-	var cue := rack.positions[cue_index]
+	var cue := rack.get_position(cue_index)
 	var leave := Vector3(preview.velocity.x, 0.0, preview.velocity.z)
 	if leave.length() < 1.0e-6:
 		var dead := ShotGhost.new()
@@ -25,8 +25,9 @@ static func stretch_of(rack: RackState, preview: ShotPreview, layout: TableLayou
 	for i in rack.numbers.size():
 		if i == cue_index:
 			continue
-		var ox := rack.positions[i].x - cue.x
-		var oz := rack.positions[i].z - cue.z
+		var ball_position := rack.get_position(i)
+		var ox := ball_position.x - cue.x
+		var oz := ball_position.z - cue.z
 		var along := ox * leave.x + oz * leave.z
 		if along <= 0.0:
 			continue
@@ -43,7 +44,7 @@ static func stretch_of(rack: RackState, preview: ShotPreview, layout: TableLayou
 	if hit >= 0:
 		ghost.has_hit = true
 		ghost.hit_ball_number = rack.numbers[hit]
-		ghost.hit_position = rack.positions[hit]
+		ghost.hit_position = rack.get_position(hit)
 		ghost.ghost_position = cue + leave * best
 		ghost.line_end = ghost.ghost_position
 	return ghost

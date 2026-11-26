@@ -19,10 +19,11 @@ static func is_legal(position: Vector3, layout: TableLayout, rack: RackState,
 		return false
 	if rack == null:
 		return true
-	for i in rack.positions.size():
-		if i < rack.numbers.size() and int(rack.numbers[i]) == 0:
+	# `positions` holds three floats per ball; the ball count lives in `numbers`.
+	for i in rack.numbers.size():
+		if int(rack.numbers[i]) == 0:
 			continue
-		var other := rack.positions[i]
+		var other := rack.get_position(i)
 		var flat := Vector2(position.x - other.x, position.z - other.z)
 		if flat.length() < 2.0 * r - tolerance:
 			return false

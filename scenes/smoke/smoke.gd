@@ -26,21 +26,25 @@ func _ready() -> void:
 	print("model version: ", core.get_model_version())
 	print("miscue limit: ", core.get_miscue_limit(), " m")
 
-	var positions := PackedVector3Array()
-	var numbers := PackedInt32Array()
+	# Build the pinned rack as a RackState: flat f64 triples in the CORE frame,
+	# the same shape the wire uses. The display vectors below are converted by
+	# add_ball's inverse transform (x, -z, y); this smoke exercises that path.
+	var rack := RackState.new()
 	# The cue ball, a quarter of a metre to the side of the rack.
-	positions.append(Vector3(0.25, RADIUS, -0.5625))
-	numbers.append(0)
+	rack.add_ball(0, Vector3(0.25, RADIUS, -0.5625))
 	# The rack: four by four, with one ball missing.
 	for row in 4:
 		for column in 4:
 			if row == 0 and column == 0:
 				continue
-			positions.append(Vector3(0.5 + 0.0625 * column, RADIUS, -(0.5 + 0.0625 * row)))
-			numbers.append(positions.size() - 1)
+			rack.add_ball(rack.ball_count(),
+				Vector3(0.5 + 0.0625 * column, RADIUS, -(0.5 + 0.0625 * row)))
 
+	# Stage 1 still calls the f32 bridge, which wants Godot-frame vectors.
+	# RackState.display_from_flat applies the one-way `(x, z, -y)` transform.
 	# The cue travels along the core's `+y`, which is Godot's `-z`.
-	var shot := core.simulate(8.0, Vector3(0.0, 0.0, -1.0), Vector2.ZERO, positions, numbers)
+	var shot := core.simulate(8.0, Vector3(0.0, 0.0, -1.0), Vector2.ZERO,
+		RackState.display_from_flat(rack.positions), rack.numbers)
 
 	print("duration: ", shot.get_duration(), " s")
 	print("events: ", shot.get_events().size())

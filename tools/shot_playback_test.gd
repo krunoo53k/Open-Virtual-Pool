@@ -17,15 +17,12 @@ var _finish_seen := false  # the path_finished connection has fired.
 
 func build_rack() -> RackState:
 	var rack := RackState.new()
-	rack.positions.append(Vector3(0.25, RADIUS, -0.5625))
-	rack.numbers.append(0)
-	rack.rotations.append(Vector3.ZERO)
+	# add_ball takes Godot-frame vectors and stores flat core-frame triples.
+	rack.add_ball(0, Vector3(0.25, RADIUS, -0.5625))
 	for row in 4:
 		for col in 4 - row:
-			rack.positions.append(Vector3(0.5 + 0.0625 * col, RADIUS,
+			rack.add_ball(rack.ball_count(), Vector3(0.5 + 0.0625 * col, RADIUS,
 				-(0.5 + 0.0625 * row + 0.05 * row)))
-			rack.numbers.append(rack.positions.size() - 1)
-			rack.rotations.append(Vector3.ZERO)
 	return rack
 
 

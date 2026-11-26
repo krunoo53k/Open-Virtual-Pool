@@ -66,7 +66,7 @@ func _run_game() -> void:
 	_check(game.rack.numbers.has(0) and game.rack.numbers.size() == rack_before_scratch,
 		"a scratch keeps the cue in the rack")
 	var cue: int = game.rack.numbers.find(0)
-	_check(cue >= 0 and CuePlacement.is_legal(game.rack.positions[cue],
+	_check(cue >= 0 and CuePlacement.is_legal(game.rack.get_position(cue),
 		game.get_node("Simulation").layout, game.rack),
 		"ball-in-hand places the cue legally")
 	await _finish_game()

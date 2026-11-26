@@ -11,7 +11,9 @@ static func clean_spot(layout: TableLayout, rack: RackState) -> Vector3:
 			var p := Vector3(layout.length * (0.07 + 0.075 * i), r,
 				-layout.width * (0.1 + 0.16 * j))
 			var clear := true
-			for other in rack.positions:
+			# positions is flat core-frame triples; the accessors give display Vector3s.
+			for ball_index in rack.numbers.size():
+				var other := rack.get_position(ball_index)
 				var flat := Vector2(p.x - other.x, p.z - other.z)
 				if flat.length() < 4.0 * r:
 					clear = false

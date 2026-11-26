@@ -9,6 +9,9 @@ signal turn_changed(player: int)
 signal match_finished(winner: int)
 signal judgement_made(ruling: Judgement)
 signal shot_resolved(log: ShotLog)
+## Online only: the local judging step is paused so the authoritative COMMIT
+## can decide the ruling and the state transition. Hotseat never emits it.
+signal judgement_pending()
 
 @export var flow: TurnFlow
 @export var rules: EightBallRules
@@ -25,6 +28,14 @@ var _winner := 0
 var _shot  # PoolShot, the path under replay.
 var _outcome: ShotOutcome
 var _params: ShotParams
+
+## Online seams. Both default off, so hotseat is untouched:
+## - `use_serialized_resolve` makes the strike run on the numbers that were
+##   actually put on the wire (post-serialization prediction);
+## - `suppress_judging` holds the Judging phase for the composer, which then
+##   applies the server's authoritative ruling instead of a local one.
+var use_serialized_resolve := false
+var suppress_judging := false
 
 
 func bind(match_state: MatchState, rack_state: RackState, shooters: Array[Node]) -> void:
@@ -95,7 +106,16 @@ func _on_phase(phase: String, player: int) -> void:
 		"AwaitingShot":
 			turn_changed.emit(player)
 		"Striking":
-			_shot = simulation.resolve(_params, rack)
+			if use_serialized_resolve:
+				# Round-trip through JSON so the prediction runs on exactly the
+				# f64 values that crossed the wire, never the caller's locals.
+				var params_wire: Variant = JSON.parse_string(JSON.stringify(
+					simulation.params_dict(_params), "", false, true))
+				var rack_wire: Variant = JSON.parse_string(JSON.stringify(
+					simulation.rack_dict(rack), "", false, true))
+				_shot = simulation.resolve_serialized(params_wire, rack_wire)
+			else:
+				_shot = simulation.resolve(_params, rack)
 			_outcome = simulation.outcome_of(_shot)
 			# Snapshot while the rack is still the one the core was handed:
 			# the ruling folds it forward into the final frame moments later.
@@ -104,6 +124,11 @@ func _on_phase(phase: String, player: int) -> void:
 			playback.play(_shot, rack)
 			flow.go_to("Rolling")
 		"Judging":
+			if suppress_judging:
+				# The shot is still on the table; the online composer applies the
+				# authoritative COMMIT when it arrives and chooses the next phase.
+				judgement_pending.emit()
+				return
 			var ruling := MatchJudge.judge_and_apply(rules, simulation,
 				_shot, _outcome, _params, state, rack, rack_view, simulation.layout)
 			judgement_made.emit(ruling)

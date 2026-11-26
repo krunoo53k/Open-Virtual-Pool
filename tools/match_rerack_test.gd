@@ -11,7 +11,7 @@ var _fails := 0
 func _ready() -> void:
 	var game = $Match
 	var initial_numbers := PackedInt32Array(game.rack.numbers)
-	var initial_positions := PackedVector3Array(game.rack.positions)
+	var initial_positions := RackState.display_from_flat(game.rack.positions)
 	game.get_node("ShotPlayback").time_scale = 1000.0  # finish the replay in one frame
 
 	# the 8 potted on a legal break: re_rack, no foul, shooter breaks again
@@ -32,7 +32,8 @@ func _ready() -> void:
 			break
 
 	_check(game.rack.numbers == initial_numbers, "re-rack restores every ball number")
-	_check(game.rack.positions == initial_positions, "re-rack restores the seeded spots")
+	_check(RackState.display_from_flat(game.rack.positions) == initial_positions,
+		"re-rack restores the seeded spots")
 	_check(game.get_state().remaining.size() == 15, "re-rack restores the remaining list")
 	_check(game.get_state().break_next, "re-rack leaves the next stroke a break")
 	var visible := 0

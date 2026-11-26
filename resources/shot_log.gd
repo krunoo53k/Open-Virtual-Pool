@@ -25,10 +25,7 @@ static func capture(simulation: PoolSimulation, params: ShotParams, rack: RackSt
 	log.model_version = simulation.model_version()
 	log.player = player
 	log.params = params.duplicate()
-	log.rack = RackState.new()
-	log.rack.numbers = PackedInt32Array(rack.numbers)
-	log.rack.positions = PackedVector3Array(rack.positions)
-	log.rack.rotations = PackedVector3Array(rack.rotations)
+	log.rack = rack.duplicate_rack()
 	log.hash = shot.get_hash()
 	log.duration = shot.get_duration()
 	log.outcome = outcome
@@ -36,7 +33,9 @@ static func capture(simulation: PoolSimulation, params: ShotParams, rack: RackSt
 	return log
 
 
-## Plain JSON-ready data: PackedVectors become arrays, Resources become fields.
+## Plain JSON-ready data: the flat core-frame triples are written back as
+## per-ball triples (with an explicit `frame` marker), Resources become fields.
+## Floats are emitted at full precision by the caller's JSON.stringify.
 func to_dict() -> Dictionary:
 	return {
 		"format": FORMAT,
@@ -51,9 +50,10 @@ func to_dict() -> Dictionary:
 			"called_pocket": params.called_pocket,
 		},
 		"rack_before": {
+			"frame": "core",
 			"numbers": Array(rack.numbers),
-			"positions": _vectors(rack.positions),
-			"rotations": _vectors(rack.rotations),
+			"positions": RackState.to_triples(rack.positions),
+			"rotations": RackState.to_triples(rack.rotations),
 		},
 		"shot": {"hash": hash, "duration": duration},
 		"outcome": {
@@ -67,13 +67,6 @@ func to_dict() -> Dictionary:
 		},
 		"events": _events(),
 	}
-
-
-static func _vectors(vectors: PackedVector3Array) -> Array:
-	var out: Array = []
-	for vector in vectors:
-		out.append([vector.x, vector.y, vector.z])
-	return out
 
 
 func _events() -> Array:

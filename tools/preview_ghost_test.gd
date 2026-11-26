@@ -33,12 +33,9 @@ func _cue_touch_drift(shot: PoolShot, ghost: ShotGhost) -> float:
 
 func _build_cut_rack(cue: Vector3, leave: Vector3, perp: Vector3) -> RackState:
 	var rack := RackState.new()
-	rack.positions.append(cue)
-	rack.numbers.append(0)
-	rack.rotations.append(Vector3.ZERO)
-	rack.positions.append(cue + leave * LAYBACK + perp * CUT_OFFSET)
-	rack.numbers.append(1)
-	rack.rotations.append(Vector3.ZERO)
+	# add_ball takes Godot-frame vectors and stores flat core-frame triples.
+	rack.add_ball(0, cue)
+	rack.add_ball(1, cue + leave * LAYBACK + perp * CUT_OFFSET)
 	return rack
 
 

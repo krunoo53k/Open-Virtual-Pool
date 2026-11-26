@@ -59,6 +59,21 @@ func _clear_balls() -> void:
 	_balls.clear()
 
 
+## Online rollback: drop the shot without ever firing `path_finished`, so a
+## server-rejected stroke leaves no animated balls on the table. The next
+## `play()` fully replaces the ball set.
+func cancel() -> void:
+	_path = null
+	_duration = 0.0
+	_clock = 0.0
+	_fired = true
+	_clear_balls()
+
+
+func has_active_shot() -> bool:
+	return _path != null
+
+
 func is_finished() -> bool:
 	# the clamp parks the clock at the duration and never past it.
 	return _clock >= _duration

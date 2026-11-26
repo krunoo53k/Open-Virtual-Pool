@@ -10,7 +10,7 @@ signal view_state_changed(state: AimViewState)
 @export var simulation: PoolSimulation
 
 var _rack: RackState
-var _shooter: HumanShooter
+var _shooter: Object
 var _state: AimViewState
 var _signature := ""
 
@@ -35,7 +35,7 @@ func bind(rack: RackState) -> void:
 	_rack = rack
 
 
-func follow(shooter: HumanShooter) -> void:
+func follow(shooter: Node) -> void:
 	if _shooter != null and _shooter.aim_state_changed.is_connected(_on_state_changed):
 		_shooter.aim_state_changed.disconnect(_on_state_changed)
 	_shooter = shooter
@@ -50,8 +50,8 @@ func set_view_visible(value: bool) -> void:
 
 
 func get_cue_position() -> Vector3:
-	if _rack != null and not _rack.positions.is_empty():
-		return _rack.positions[0]
+	if _rack != null and not _rack.numbers.is_empty():
+		return _rack.get_position(0)
 	return Vector3.ZERO
 
 
@@ -64,7 +64,7 @@ func _on_state_changed() -> void:
 
 
 func _refresh() -> void:
-	if _shooter == null or _rack == null or _rack.positions.is_empty():
+	if _shooter == null or _rack == null or _rack.numbers.is_empty():
 		return
 	var state := AimStateReader.read(_shooter)
 	var params := ShotParams.new()

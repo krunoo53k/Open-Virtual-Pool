@@ -14,6 +14,12 @@ var state := MatchState.new()
 var rack := RackState.new()
 var _called_pocket := -1
 
+## Online seam: when valid, a local stroke is handed to the online composer
+## instead of being resolved locally. Hotseat leaves this empty, so its path
+## is byte-for-byte the same as before. The online composer uses it to send
+## SHOT first and predict from the post-serialization values.
+var shot_sink: Callable = Callable()
+
 
 func _ready() -> void:
 	InputActions.register_defaults()
@@ -25,7 +31,9 @@ func _ready() -> void:
 		"ball_radius": layout.ball_radius})
 	$BallRack.rebuild()
 	rack.numbers = $BallRack.get_numbers()
-	rack.positions = $BallRack.get_positions(); rack.rotations = $BallRack.get_orientations()
+	# The view speaks Godot's frame; RackState stores flat core-frame triples.
+	rack.positions = RackState.flat_from_display($BallRack.get_positions())
+	rack.rotations = RackState.flat_from_display($BallRack.get_orientations())
 	$BallInHandInput.layout = layout
 	$BallInHandInput.rack = rack
 	_wire_views(layout, sim)
@@ -81,6 +89,9 @@ func _on_shot_committed(params: ShotParams, player: int) -> void:
 	if player == $TurnFlow.get_active_player():
 		params.called_pocket = _called_pocket
 		_called_pocket = -1
+		if shot_sink.is_valid():
+			shot_sink.call(params, player)
+			return
 		take_shot(params)
 
 

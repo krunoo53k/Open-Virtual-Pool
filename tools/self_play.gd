@@ -64,7 +64,8 @@ func _plan(game: Match) -> ShotParams:
 	var sim: PoolSimulation = game.get_node("Simulation")
 	var layout: TableLayout = sim.layout
 	var cue_index := rack.numbers.find(0)
-	var cue_flat := Vector2(rack.positions[cue_index].x, rack.positions[cue_index].z)
+	var cue_pos := rack.get_position(cue_index)
+	var cue_flat := Vector2(cue_pos.x, cue_pos.z)
 	var group := 0
 	if state.solids_player != 0:
 		group = 1 if state.solids_player == state.player else 2
@@ -89,7 +90,8 @@ func _plan(game: Match) -> ShotParams:
 		var index := rack.numbers.find(target)
 		if index < 0:
 			continue
-		var ball_flat := Vector2(rack.positions[index].x, rack.positions[index].z)
+		var ball_pos := rack.get_position(index)
+		var ball_flat := Vector2(ball_pos.x, ball_pos.z)
 		for pocket in layout.pocket_mouth_centres.size():
 			var params := _aim(cue_flat, ball_flat,
 				layout.pocket_mouth_centres[pocket], layout.ball_radius)
@@ -118,13 +120,15 @@ func _plan(game: Match) -> ShotParams:
 			var index := rack.numbers.find(target)
 			if index < 0:
 				continue
-			var d := cue_flat.distance_to(Vector2(rack.positions[index].x, rack.positions[index].z))
+			var other := rack.get_position(index)
+			var d := cue_flat.distance_to(Vector2(other.x, other.z))
 			if d < near:
 				near = d
 				nearest = target
 		if nearest > 0:
 			var index := rack.numbers.find(nearest)
-			var ball_flat := Vector2(rack.positions[index].x, rack.positions[index].z)
+			var nearest_pos := rack.get_position(index)
+			var ball_flat := Vector2(nearest_pos.x, nearest_pos.z)
 			chosen = _aim(cue_flat, ball_flat, cue_flat, layout.ball_radius)
 			chosen.called_pocket = -1
 			_planned_target = nearest

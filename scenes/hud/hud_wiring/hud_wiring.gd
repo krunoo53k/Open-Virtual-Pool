@@ -10,6 +10,10 @@ signal pause_changed(open: bool)
 
 const MENU_SCENE := "res://scenes/main_menu/main_menu.tscn"
 
+## Online seam: leaving an online match is a forfeit, so the composer sends
+## LEAVE before the menu transition. Hotseat leaves this empty.
+var online_leave_sink: Callable = Callable()
+
 var _hud: Hud
 var _state: MatchState
 
@@ -46,5 +50,10 @@ func _on_pause_intent(intent: String) -> void:
 		_hud.toggle_pause()
 	elif intent == "restart":
 		get_tree().reload_current_scene()
-	elif intent == "menu" and ResourceLoader.exists(MENU_SCENE):
-		get_tree().change_scene_to_file(MENU_SCENE)
+	elif intent == "menu":
+		if online_leave_sink.is_valid():
+			# The online composer sends LEAVE (a forfeit) and routes the menu.
+			online_leave_sink.call()
+			return
+		if ResourceLoader.exists(MENU_SCENE):
+			get_tree().change_scene_to_file(MENU_SCENE)

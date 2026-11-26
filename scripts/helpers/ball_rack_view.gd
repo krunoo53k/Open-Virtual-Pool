@@ -10,9 +10,12 @@ static func apply_state(view: BallRack, rack: RackState) -> void:
 	var spots := {}
 	for i in rack.numbers.size():
 		var orientation := Vector3.ZERO
-		if i < rack.rotations.size():
-			orientation = rack.rotations[i]
-		spots[int(rack.numbers[i])] = {"position": rack.positions[i], "rotation": orientation}
+		if i * 3 + 2 < rack.rotations.size():
+			orientation = rack.get_rotation(i)
+		# The accessors apply the one-way core -> display transform; the view
+		# never reads the flat core-frame triples directly.
+		spots[int(rack.numbers[i])] = {"position": rack.get_position(i),
+			"rotation": orientation}
 	var numbers := view.get_numbers()
 	for i in numbers.size():
 		var ball := view.get_child(i) as Ball

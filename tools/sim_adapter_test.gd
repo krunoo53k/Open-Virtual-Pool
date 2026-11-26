@@ -16,30 +16,23 @@ const LANE_HASH := "f1cc92702b7599ec"  # 8 m/s, straight into the side pocket.
 
 func build_rack() -> RackState:
 	var rack := RackState.new()
-	rack.positions.append(Vector3(0.25, RADIUS, -0.5625))
-	rack.numbers.append(0)
-	rack.rotations.append(Vector3.ZERO)
+	# add_ball takes Godot-frame vectors and stores flat core-frame triples.
+	rack.add_ball(0, Vector3(0.25, RADIUS, -0.5625))
 	for row in 4:
 		for col in 4 - row:
-			rack.positions.append(Vector3(0.5 + 0.0625 * col, RADIUS,
+			rack.add_ball(rack.ball_count(), Vector3(0.5 + 0.0625 * col, RADIUS,
 				-(0.5 + 0.0625 * row + 0.05 * row)))
-			rack.numbers.append(rack.positions.size() - 1)
-			rack.rotations.append(Vector3.ZERO)
 	return rack
 
 
 ## A rack whose cue ball runs straight into the side pocket's shelf.
 func build_lane_rack() -> RackState:
 	var rack := RackState.new()
-	rack.positions.append(Vector3(1.27, RADIUS, 0.5625))
-	rack.numbers.append(0)
-	rack.rotations.append(Vector3.ZERO)
+	rack.add_ball(0, Vector3(1.27, RADIUS, 0.5625))
 	for row in 4:
 		for col in 4 - row:
-			rack.positions.append(Vector3(0.5 + 0.0625 * col, RADIUS,
+			rack.add_ball(rack.ball_count(), Vector3(0.5 + 0.0625 * col, RADIUS,
 				-(0.5 + 0.0625 * row + 0.05 * row)))
-			rack.numbers.append(rack.positions.size() - 1)
-			rack.rotations.append(Vector3.ZERO)
 	return rack
 
 
@@ -57,12 +50,8 @@ func take_shot(rack: RackState, speed: float, aim_deg: float, elevation_deg: flo
 ## A rack where two object balls nearly touch: the pair grinds forever.
 func build_jitter_rack() -> RackState:
 	var rack := build_rack()
-	rack.positions.append(Vector3(0.6, RADIUS, -0.5))
-	rack.numbers.append(rack.positions.size() - 1)
-	rack.rotations.append(Vector3.ZERO)
-	rack.positions.append(Vector3(0.6000000001, RADIUS, -0.5000000001))
-	rack.numbers.append(rack.positions.size() - 1)
-	rack.rotations.append(Vector3.ZERO)
+	rack.add_ball(rack.ball_count(), Vector3(0.6, RADIUS, -0.5))
+	rack.add_ball(rack.ball_count(), Vector3(0.6000000001, RADIUS, -0.5000000001))
 	return rack
 
 
