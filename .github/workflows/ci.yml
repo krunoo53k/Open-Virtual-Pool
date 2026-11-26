@@ -63,7 +63,7 @@ jobs:
           fi
           mkdir -p /tmp/godot
           curl -fsSL -o /tmp/godot.zip \
-            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_${GODOT_VERSION}_linux.x86_64.zip"
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
           unzip -o /tmp/godot.zip -d /tmp/godot
           chmod +x "$GODOT"
           "$GODOT" --version
@@ -73,6 +73,13 @@ jobs:
           set -euxo pipefail
           cp engine/target/release/libpool_godot.so bin/
           ls -l bin/libpool_godot.so
+
+      # `.godot/` is gitignored, so a fresh checkout has neither the imported
+      # assets nor the global class cache. Without this pass, scripts fail to
+      # parse, smoke never calls quit(), and the whole job hangs.
+      - name: Import project (generate Godot caches)
+        run: |
+          "$GODOT" --headless --path . --import
 
       - name: Smoke + self-play
         run: |
