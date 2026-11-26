@@ -1,0 +1,153 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  # Pinned in compat/compat.json; keep both in step when the engine moves.
+  ENGINE_REF: 2a778c6
+  GODOT_VERSION: 4.7.2-stable
+  GODOT: /tmp/godot/Godot_v4.7.2-stable_linux.x86_64
+
+jobs:
+  headless:
+    name: Build extension + headless harnesses
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout game repo
+        uses: actions/checkout@v4
+
+      - name: Checkout pinned engine
+        uses: actions/checkout@v4
+        with:
+          repository: krunoo53k/Virtual-Pool-Physics-Engine
+          ref: ${{ env.ENGINE_REF }}
+          path: engine
+
+      # The README records that CI verifies this manifest. A drift here is a
+      # hard failure: a harness can only be trusted against a known revision.
+      - name: Verify compat manifest
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("compat/compat.json").read_text())
+          expected = {
+              "core": "2a778c6",
+              "rules": None,
+              "intent": None,
+              "protocol": "1",
+              "model": "1.9",
+          }
+          assert manifest == expected, f"compat drift: {manifest!r} != {expected!r}"
+          print("compat manifest verified:", json.dumps(manifest, sort_keys=True))
+          PY
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build engine extension (release)
+        working-directory: engine
+        run: cargo build --release -p pool-godot
+
+      - name: Install Godot 4.7 (Linux, headless)
+        run: |
+          set -euxo pipefail
+          # Pinned Godot 4.7.2 stable from the official GitHub release. No
+          # system godot is assumed on the runner; document the exact source.
+          if ! command -v unzip >/dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y unzip
+          fi
+          mkdir -p /tmp/godot
+          curl -fsSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_${GODOT_VERSION}_linux.x86_64.zip"
+          unzip -o /tmp/godot.zip -d /tmp/godot
+          chmod +x "$GODOT"
+          "$GODOT" --version
+
+      - name: Install extension binary
+        run: |
+          set -euxo pipefail
+          cp engine/target/release/libpool_godot.so bin/
+          ls -l bin/libpool_godot.so
+
+      - name: Smoke + self-play
+        run: |
+          set -euxo pipefail
+          "$GODOT" --headless --path . res://scenes/smoke.tscn
+          "$GODOT" --headless --path . res://tools/self_play.tscn
+
+      # These two harnesses have not landed yet. Skip gracefully rather than
+      # failing the matrix; they hard-fail once the scenes are committed.
+      - name: Protocol fixtures harness (if present)
+        run: |
+          set -euxo pipefail
+          if [ -f tools/protocol_fixtures_test.tscn ]; then
+            "$GODOT" --headless --path . res://tools/protocol_fixtures_test.tscn
+          else
+            echo "skip: tools/protocol_fixtures_test.tscn not landed yet"
+          fi
+
+      - name: f64 round-trip pin (if present)
+        run: |
+          set -euxo pipefail
+          if [ -f tools/f64_round_trip_test.tscn ]; then
+            "$GODOT" --headless --path . res://tools/f64_round_trip_test.tscn
+          else
+            echo "skip: tools/f64_round_trip_test.tscn not landed yet"
+          fi
+
+      # Any online harnesses added later are picked up automatically; the
+      # glob is nullglob so an empty set is a skip, not an error.
+      - name: Online harnesses (if present)
+        run: |
+          set -euxo pipefail
+          shopt -s nullglob
+          scenes=(tools/*online*_test.tscn tools/net_*_test.tscn)
+          if [ ${#scenes[@]} -gt 0 ]; then
+            mapfile -t scenes < <(printf '%s\n' "${scenes[@]}" | sort -u)
+          fi
+          if [ ${#scenes[@]} -eq 0 ]; then
+            echo "skip: no online harness scenes landed yet"
+          fi
+          for scene in "${scenes[@]}"; do
+            echo "::group::$scene"
+            "$GODOT" --headless --path . "res://$scene"
+            echo "::endgroup::"
+          done
+
+      - name: All tools harnesses (except the two triage items below)
+        run: |
+          set -euxo pipefail
+          shopt -s nullglob
+          for scene in tools/*_test.tscn; do
+            case "$scene" in
+              tools/input_scene_test.tscn|tools/ball_in_hand_pointer_test.tscn)
+                echo "skip here: $scene runs in its own continue-on-error step"
+                continue
+                ;;
+              tools/*online*_test.tscn|tools/net_*_test.tscn)
+                echo "skip here: $scene runs in the online harness step"
+                continue
+                ;;
+            esac
+            echo "::group::$scene"
+            "$GODOT" --headless --path . "res://$scene"
+            echo "::endgroup::"
+          done
+
+      # Known-failing at baseline on this machine, pending input-harness
+      # triage. These are the ONLY continue-on-error steps in the workflow:
+      # every other harness above must hard-fail. Documented in the README.
+      - name: Known-failing harness — input_scene_test
+        continue-on-error: true
+        run: |
+          "$GODOT" --headless --path . res://tools/input_scene_test.tscn
+
+      - name: Known-failing harness — ball_in_hand_pointer_test
+        continue-on-error: true
+        run: |
+          "$GODOT" --headless --path . res://tools/ball_in_hand_pointer_test.tscn

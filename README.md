@@ -219,3 +219,47 @@ unchanged — only their meshes and materials were replaced.
 - `scenes/smoke.tscn` — the bridge smoke test with the pinned golden hash.
 - `.hermes/skills/godot-composition/` — the repo-local composition skill;
   `scripts/lint_composition.py` must stay at zero errors.
+
+## Online multiplayer — status
+
+See [`docs/online-multiplayer.md`](docs/online-multiplayer.md) for the pinned
+revisions and the client timeline, and [`docs/threat-model.md`](docs/threat-model.md)
+for the protocol §13 trust boundary. In short: the server owns all truth; the
+client sends intent and treats every snapshot from an arbitrary lobby URL as
+untrusted (reject invalid values, never clamp). Client-side local solving and
+opponent aim spoofing are accepted v1 limitations; a hash mismatch snaps and an
+`ERROR` rolls back.
+
+C1 stage 1 is in place: `RackState` carries flat core-frame f64 triples behind
+a legacy f32 bridge. Stage 2 is gated on `PoolSimulation.USE_F64_INTENT`, which
+stays `false` because the pinned engine rev has no `simulate_from_intent_f64`.
+Hotseat remains on the f32 path with a provisional sunset of **2027-06-30**
+until the engine entry point lands.
+
+**E0 fact-check note:** the `VersionStamp` paragraph above still reads `1.8`,
+but the loaded engine reports model version **`1.9`**. That old line is left
+unchanged here on purpose; it is flagged as an E0 fact-check item in
+`docs/online-multiplayer.md`, not silently rewritten.
+
+## Platform matrix
+
+| Target | Status |
+|---|---|
+| Desktop Linux / Windows / macOS | **supported** — the only targets with a shipped extension binary manifest (`bin/pool_godot.gdextension`). |
+| Mobile Android / iOS | **pending G0 spike** — no on-device extension build verified. |
+| Web browser (wasm / gdext) | **pending G0 spike** — no gdext/web spike result exists on disk; no browser prediction asserted. |
+
+Web becomes **supported** only when the extension loads in the browser, the
+engine canary matches, and local prediction runs and agrees with the pins.
+Until then web play uses the server-authoritative remote path.
+
+## Compatibility manifest and CI
+
+[`compat/compat.json`](compat/compat.json) pins the revisions this build is
+checked against: `core` `2a778c6`, `protocol` `1`, `model` `1.9`, with `rules`
+and `intent` still `null` (pending). **CI verifies this manifest**, then builds
+the engine at rev `2a778c6`, copies `libpool_godot.so` into `bin/`, and runs all
+headless harnesses under Godot 4.7. Two input harnesses
+(`tools/input_scene_test.tscn` and `tools/ball_in_hand_pointer_test.tscn`) are
+known-failing at baseline pending input-harness triage; CI runs them in separate
+`continue-on-error` steps so the rest of the matrix still hard-fails.
