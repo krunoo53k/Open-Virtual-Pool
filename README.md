@@ -259,7 +259,7 @@ Until then web play uses the server-authoritative remote path.
 checked against: `core` `2a778c6`, `protocol` `1`, `model` `1.9`, with `rules`
 and `intent` still `null` (pending). **CI verifies this manifest**, then builds
 the engine at rev `2a778c6`, copies `libpool_godot.so` into `bin/`, and runs all
-headless harnesses under Godot 4.7. Two input harnesses
-(`tools/input_scene_test.tscn` and `tools/ball_in_hand_pointer_test.tscn`) are
-known-failing at baseline pending input-harness triage; CI runs them in separate
-`continue-on-error` steps so the rest of the matrix still hard-fails.
+headless harnesses under Godot 4.7. One input harness
+(`tools/input_scene_test.tscn`) is known-failing at baseline pending
+input-harness triage; CI runs it in a `continue-on-error` step so the rest of
+the matrix still hard-fails.

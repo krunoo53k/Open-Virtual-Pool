@@ -98,6 +98,7 @@ from the wire, never on the caller's locals.
 
 `.github/workflows/ci.yml` checks `compat/compat.json`, builds the engine
 extension at rev `2a778c6`, copies the binary into `bin/`, and runs every
-headless harness. Two input harnesses are known-failing at baseline and are
-isolated with `continue-on-error` (see the README). Trust details live in
+headless harness. One input harness (`tools/input_scene_test.tscn`) is
+known-failing at baseline and is isolated with `continue-on-error` (see the
+README). Trust details live in
 [`threat-model.md`](threat-model.md).

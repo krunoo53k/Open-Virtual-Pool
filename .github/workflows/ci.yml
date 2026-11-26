@@ -119,13 +119,13 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: All tools harnesses (except the two triage items below)
+      - name: All tools harnesses (except the triage item below)
         run: |
           set -euxo pipefail
           shopt -s nullglob
           for scene in tools/*_test.tscn; do
             case "$scene" in
-              tools/input_scene_test.tscn|tools/ball_in_hand_pointer_test.tscn)
+              tools/input_scene_test.tscn)
                 echo "skip here: $scene runs in its own continue-on-error step"
                 continue
                 ;;
@@ -140,14 +140,9 @@ jobs:
           done
 
       # Known-failing at baseline on this machine, pending input-harness
-      # triage. These are the ONLY continue-on-error steps in the workflow:
+      # triage. This is the ONLY continue-on-error step in the workflow:
       # every other harness above must hard-fail. Documented in the README.
       - name: Known-failing harness — input_scene_test
         continue-on-error: true
         run: |
           "$GODOT" --headless --path . res://tools/input_scene_test.tscn
-
-      - name: Known-failing harness — ball_in_hand_pointer_test
-        continue-on-error: true
-        run: |
-          "$GODOT" --headless --path . res://tools/ball_in_hand_pointer_test.tscn
