@@ -7,7 +7,7 @@ on:
 
 env:
   # Pinned in compat/compat.json; keep both in step when the engine moves.
-  ENGINE_REF: 2a778c6
+  ENGINE_REF: 2a778c672aa3f5c7e21eca4d590bfe11adaee728
   GODOT_VERSION: 4.7.2-stable
   GODOT: /tmp/godot/Godot_v4.7.2-stable_linux.x86_64
 
@@ -36,7 +36,7 @@ jobs:
 
           manifest = json.loads(Path("compat/compat.json").read_text())
           expected = {
-              "core": "2a778c6",
+              "core": "2a778c672aa3f5c7e21eca4d590bfe11adaee728",
               "rules": None,
               "intent": None,
               "protocol": "1",
