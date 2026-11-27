@@ -21,6 +21,10 @@ func _ready() -> void:
 	var game: Match = online.match_node
 	_check(game != null, "the hotseat Match scene was reused")
 	var flow: MatchFlow = game.get_node("MatchFlow")
+	var sim: PoolSimulation = game.get_node("Simulation")
+	_check(PoolSimulation.USE_F64_INTENT, "stage 2 is enabled")
+	_check(sim.core != null and sim.core.has_method("simulate_from_intent_f64"),
+		"the loaded engine exposes the f64 intent entry point")
 	_check(flow.use_serialized_resolve, "prediction runs on wire values")
 	_check(flow.suppress_judging, "local ruling is held for COMMIT")
 	var remote_script: Script = game.get_node("Shooter2").get_script()

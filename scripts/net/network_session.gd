@@ -152,12 +152,13 @@ func _on_open() -> void:
 	var core = null
 	if ClassDB.class_exists("PoolCore"):
 		core = PoolCore.new()
-	var canary := DeterminismCanary.compute(core)
 	_hello_sent = true
 	_last_ping_ms = Time.get_ticks_msec()
 	_last_pong_ms = _last_ping_ms
 	connected_to_server.emit()
-	send(ProtocolVersions.hello_fields(core, player_name, canary))
+	# Model, revisions and canary come from the loaded engine's build info;
+	# nothing about the handshake is hardcoded in GDScript.
+	send(ProtocolVersions.hello_fields(core, player_name))
 
 
 func _on_close() -> void:

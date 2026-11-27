@@ -1,7 +1,8 @@
 {
-  "core": "2a778c672aa3f5c7e21eca4d590bfe11adaee728",
-  "rules": null,
-  "intent": null,
-  "protocol": "1",
-  "model": "1.9"
+  "core": "145dd3f2f2e33894afedcbcac05a3ca78e6ae2c0",
+  "rules": "860b664886536e742ccb0a07a2823d9bc13a78ab",
+  "intent": "860b664886536e742ccb0a07a2823d9bc13a78ab",
+  "protocol": "1.0",
+  "model": "1.10",
+  "canary": "c8ee370c4195017f"
 }

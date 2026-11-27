@@ -19,9 +19,10 @@ class_name PoolSimulation extends Node3D
 ## replayable direction, so a pin stored as degrees replays the same
 ## everywhere.
 
-## Stage 2 switch. The engine has not shipped the f64 intent entry point yet;
-## the seam below is ready but stays off so hotseat hashes do not move.
-const USE_F64_INTENT := false
+## Stage 2 switch. The pinned engine (model 1.10) ships the f64 intent entry
+## point, so online shots cross the boundary as flat f64 core-frame triples
+## with no f32 loss. Hotseat still calls the legacy bridge via `resolve()`.
+const USE_F64_INTENT := true
 
 
 var core  # the extension instance this adapter owns.

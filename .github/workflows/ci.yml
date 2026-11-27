@@ -7,7 +7,7 @@ on:
 
 env:
   # Pinned in compat/compat.json; keep both in step when the engine moves.
-  ENGINE_REF: 2a778c672aa3f5c7e21eca4d590bfe11adaee728
+  ENGINE_REF: 145dd3f2f2e33894afedcbcac05a3ca78e6ae2c0
   GODOT_VERSION: 4.7.2-stable
   GODOT: /tmp/godot/Godot_v4.7.2-stable_linux.x86_64
 
@@ -36,11 +36,12 @@ jobs:
 
           manifest = json.loads(Path("compat/compat.json").read_text())
           expected = {
-              "core": "2a778c672aa3f5c7e21eca4d590bfe11adaee728",
-              "rules": None,
-              "intent": None,
-              "protocol": "1",
-              "model": "1.9",
+              "core": "145dd3f2f2e33894afedcbcac05a3ca78e6ae2c0",
+              "rules": "860b664886536e742ccb0a07a2823d9bc13a78ab",
+              "intent": "860b664886536e742ccb0a07a2823d9bc13a78ab",
+              "protocol": "1.0",
+              "model": "1.10",
+              "canary": "c8ee370c4195017f",
           }
           assert manifest == expected, f"compat drift: {manifest!r} != {expected!r}"
           print("compat manifest verified:", json.dumps(manifest, sort_keys=True))

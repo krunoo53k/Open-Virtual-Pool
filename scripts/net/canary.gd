@@ -1,47 +1,21 @@
 class_name DeterminismCanary
 extends RefCounted
 
-## Provisional client-side determinism canary.
+## Local diagnostic fingerprint — NOT the canary sent in HELLO.
 ##
-## The loaded bridge has no engine canary API and no `simulate_from_intent_f64`
-## (model version "1.9"), so until the engine ships one we compute the same
-## fingerprint the server is asked to compute: run THREE fixed shots through a
-## real `PoolCore`, take each `PoolShot.get_hash()` string, and fold the three
-## strings into one 64-bit hash.
+## The handshake value is published by the engine through
+## `PoolCore.get_build_info()` and mirrored in `compat/compat.json`;
+## `ProtocolVersions.hello_fields()` reads it from there. The engine's exact
+## canary recipe is documented in the engine repo's
+## `docs/online-multiplayer-e0.md` §4 and MUST be implemented from that source,
+## not from the provisional recipe below.
 ##
-## ---------------------------------------------------------------------------
-## EXACT RECIPE (the future server MUST match this byte for byte)
-## ---------------------------------------------------------------------------
-## 1. Build one fixed rack (the smoke rack) in CORE-frame flat triples:
-##      radius = 0.028575,
-##      cue    = (0.25, 0.5625, radius), number 0,
-##      object i = (0.5 + 0.0625*col, 0.5 + 0.0625*row, radius),
-##                 for row = 0..3, col = 0..3, except (row, col) = (0, 0),
-##                 numbered 1..15 in row-major order.
-##    Convert to the legacy Godot-frame vectors with
-##    `RackState.display_from_flat` exactly once, then call
-##    `core.simulate(speed, direction, contact, positions, numbers)`.
-## 2. The three shots, in this order, all with direction = (0, 0, -1):
-##      A: speed 8.0,  contact (0.0,  0.0)
-##      B: speed 5.0,  contact (0.004, -0.002)
-##      C: speed 12.0, contact (-0.005, 0.003)
-##    No trig, no normalisation, no randomness — the direction is a literal so
-##    both sides feed identical f64 values into the core.
-## 3. Let hA, hB, hC be the three `get_hash()` strings (decimal/hex text).
-##    Concatenate them with NO separator into one UTF-8 byte string:
-##    `hA + hB + hC`.
-## 4. FNV-1a 64-bit over that byte string:
-##      offset basis = 0xcbf29ce484222325 (stored as signed i64
-##                     -3750763034362895579),
-##      prime        = 0x100000001b3     (1099511628211),
-##      for each byte b: acc = (acc XOR b) * prime, wrapping mod 2^64
-##      (GDScript's 64-bit int arithmetic already wraps).
-## 5. Emit the final unsigned 64-bit `acc` as exactly 16 lowercase hex digits,
-##    most significant byte first. That string is the `canary` field of HELLO.
-##
-## Any fault (missing core, faulted shot, empty hash) returns "" after a loud
-## push_error: a pure-logic harness must not crash, but a bad canary must be
-## impossible to mistake for a valid one.
+## `compute()` runs three fixed shots and folds their hashes with FNV-1a as a
+## local sanity check. It predates the engine's shared canary helper and does
+## NOT reproduce the published value. Any fault (missing core, faulted shot,
+## empty hash) returns "" after a loud push_error so a harness cannot mistake
+## a failure for a usable fingerprint.
+
 
 const RADIUS := 0.028575
 
