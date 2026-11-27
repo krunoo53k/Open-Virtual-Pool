@@ -57,10 +57,15 @@ snapshot.
 - **`ERROR` → rollback.** An `ERROR` from the authoritative path rolls back
   speculative local state to the last confirmed frame.
 
-## Out of scope at the pinned rev
+## Engine-backed checks at the pinned rev
 
-At engine rev `2a778c6` there is no engine canary API and no engine-exposed
-Rust judge, so client-side canary comparison and server-side judgement are
-design commitments rather than deployed checks. See
-[`online-multiplayer.md`](online-multiplayer.md) for the stage-2 seam and the
-E0 fact-check item (README `1.8` vs loaded model `1.9`).
+The pinned engine exposes the f64 intent entry point and the shared Rust judge,
+so HELLO carries the engine's published canary and the client's ruling preview
+uses the same judge code as the server. The client reads the handshake fields
+from `PoolCore.get_build_info()`, falling back to `compat.json` when no core is
+loaded; nothing is hardcoded in GDScript. Canary mismatch and version mismatch
+are still hard rejections with no room join.
+
+Still open for v1: the client's Godot JSON parser is not bit-exact for all f64
+patterns, so rack arrays should move to the base64 fallback by agreement with
+the server before launch. See [`online-multiplayer.md`](online-multiplayer.md).

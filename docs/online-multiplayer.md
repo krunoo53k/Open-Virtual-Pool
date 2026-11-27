@@ -8,16 +8,17 @@ online mode. v1 is server-authoritative with a thin, untrusted client.
 
 | Manifest key | Value | Meaning |
 |---|---|---|
-| `core` | `2a778c672aa3f5c7e21eca4d590bfe11adaee728` | Engine revision, branch `fix/clippy-warnings`. |
-| `rules` | `null` | No pinned rules crate revision yet — pending. |
-| `intent` | `null` | No pinned intent crate revision yet — pending. |
-| `protocol` | `1` | Online protocol doc revision; §13 is the threat model. |
-| `model` | `1.9` | Model version reported by the loaded engine, not the stale README line. |
+| `core` | `145dd3f2f2e33894afedcbcac05a3ca78e6ae2c0` | Engine merge commit of PR #7 (`feat/online-multiplayer-engine`). |
+| `rules` | `860b664886536e742ccb0a07a2823d9bc13a78ab` | Shared `pool-rules` revision. |
+| `intent` | `860b664886536e742ccb0a07a2823d9bc13a78ab` | Shared `pool-intent` revision. |
+| `protocol` | `1.0` | Online protocol doc revision; §13 is the threat model. |
+| `model` | `1.10` | Model version reported by the loaded engine. |
+| `canary` | `c8ee370c4195017f` | Engine-published three-shot canary sent in HELLO. |
 
-At engine rev `2a778c672aa3f5c7e21eca4d590bfe11adaee728` there is **no** `simulate_from_intent_f64`, **no** engine
-canary API, **no** engine-exposed Rust judge, and **no** `pool-intent` /
-`pool-rules` crates. The client must not call entry points that are not there;
-the seams below are written against their future arrival.
+At this revision the engine ships `simulate_from_intent_f64`,
+`preview_shot_json` / `judge_json`, `pool-intent`, `pool-rules` and an 81-shot
+corpus. The client uses all of them; the f32 hotseat bridge remains for the
+hotseat sunset window.
 
 ## Authority and data flow
 
@@ -39,46 +40,41 @@ state; an `ERROR` **rolls back** any speculative local state. See
 [`threat-model.md`](threat-model.md) for the accepted limitations (local solving
 and aim spoofing).
 
-## C1 client work: stage 1 landed, stage 2 pending
+## C1 client work: both stages landed
 
-- **Stage 1 (landed).** `RackState` holds positions and rotations as flat
-  **core-frame f64 triples** (`x` along the table, `y` across, `z` up), with a
-  legacy **f32 bridge** for the existing `take_shot` path. This is the same
-  layout the wire uses, so a rack can cross the socket without a Vector3 pack
-  or an f32 round trip.
-- **Stage 2 (pending).** `PoolSimulation.USE_F64_INTENT` is the switch. It is
-  currently `false`; the branch that calls `simulate_from_intent_f64` is written
-  but cannot be flipped until the engine entry point lands at the pinned rev.
-- **Hotseat** stays on the legacy f32 path. Provisional sunset date for that
-  path: **2027-06-30** (six months from 2026-11-26). The date is provisional —
-  it holds only once the engine f64 intent entry point exists and the harnesses
-  pin parity.
+- **Stage 1.** `RackState` holds positions and rotations as flat **core-frame
+  f64 triples** (`x` along the table, `y` across, `z` up), with one-way display
+  accessors. This is the wire layout too, so a rack crosses the socket without
+  a Vector3 pack or an f32 round trip.
+- **Stage 2.** `PoolSimulation.USE_F64_INTENT` is `true`. Online shots call the
+  engine's `simulate_from_intent_f64` with flat core-frame arrays, so no number
+  loses precision at the GDExtension boundary; hotseat still calls the legacy
+  f32 bridge through `resolve()`.
+- **Hotseat sunset.** The f32 path has a provisional date of **2027-06-30**.
+  Parity with the Rust judge is already pinned by
+  `tools/judge_parity_test.tscn` (54 fixtures); retiring the GDScript judge for
+  hotseat is a separate cleanup step before that date.
+- **Ruling preview.** The composer calls the engine's shared Rust judge via
+  `preview_shot_json`; the result is display-only and COMMIT always wins.
 
 ## Platform matrix
 
 | Target | Status | Basis |
 |---|---|---|
-| Desktop Linux / Windows / macOS | **supported** | These are the only targets with a shipped extension binary manifest (`bin/pool_godot.gdextension`). The extension targets API 4.6, Godot 4.7 headless harnesses run on Linux. |
-| Mobile Android / iOS | **pending G0 spike** | No on-device extension build has been verified; no shipped binary manifest. |
-| Web browser (wasm / gdext) | **pending G0 spike** | No gdext/web wasm spike result exists on disk. Browser prediction is not asserted. |
+| Desktop Linux / Windows / macOS | **supported** | Full extension, both hotseat f32 and online f64 paths; the 81-shot corpus runs on x86_64. |
+| Mobile Android / iOS | **corpus verified on aarch64, native playback pending** | The corpus replayed under `qemu-aarch64-static`; no on-device gdext build has been shipped. |
+| Web browser | **out of scope for v1** | gdext-web requires an experimental Emscripten build; the v2 direction is a standalone wasm module of `pool-core`/`pool-intent`/`pool-rules`. |
 
-Web flips to **supported** only when all three hold:
-
-1. the GDExtension **loads in the browser**;
-2. the engine **canary matches** the server's value;
-3. **prediction runs** locally and agrees with the pinned hashes.
-
-Until then web play must use the server-authoritative remote path (snapshots
-from `COMMIT`, no local prediction). Revisit the matrix when a gdext/web spike
-produces a reproducible result, not before.
+The engine's E0 spike also ran the pure-Rust crates and the corpus under
+wasm32-wasip1 as a determinism lane. That is not browser playback.
 
 ## Serialization caveat and the base64 fallback
 
 Godot 4.7's `JSON.parse_string` shifts some arbitrary 17-significant-digit f64
 values by one ULP and underflows subnormals, even though
-`JSON.stringify(..., full_precision=true)` prints them correctly. The plain
-array form in the golden fixtures therefore cannot be a bit-exact pin on this
-target. `ProtocolCodec` implements the protocol §4 fallback:
+`JSON.stringify(..., full_precision=true)` prints them correctly. The engine
+side reads the same text with a correctly-rounding JSON reader, so the two can
+disagree. `ProtocolCodec` implements the protocol §4 fallback:
 `rack_to_wire()` / `wire_to_rack()` carry the flat arrays as base64
 little-endian f64 bytes, and `tools/f64_bit_pattern_test.tscn` pins 601
 arbitrary bit patterns through a full frame. The online pipeline must agree
@@ -86,19 +82,18 @@ with the server to use that form before launch; the plain form remains the
 fixture shape until then. Prediction always runs on the values that came back
 from the wire, never on the caller's locals.
 
-## E0 fact-check items
+## E0 fact check — resolved
 
-- The `VersionStamp` paragraph in the README still says `get_model_version()`
-  is `1.8`; the loaded engine reports **`1.9`**. That old line is deliberately
-  left unchanged here and must be corrected by the E0 fact-check task, not
-  silently rewritten. The pinned manifest records the loaded value (`model:
-  1.9`).
+The `VersionStamp` paragraph in the README said `1.8`; the engine source and
+loaded extension now report **`1.10`**, and the README has been corrected.
+The pinned manifest records that value together with the engine's published
+canary.
 
 ## CI and further reading
 
-`.github/workflows/ci.yml` checks `compat/compat.json`, builds the engine
-extension at rev `2a778c672aa3f5c7e21eca4d590bfe11adaee728`, copies the binary into `bin/`, and runs every
-headless harness. One input harness (`tools/input_scene_test.tscn`) is
-known-failing at baseline and is isolated with `continue-on-error` (see the
-README). Trust details live in
+`.github/workflows/ci.yml` checks `compat/compat.json`, builds the engine at the
+pinned commit, imports the project (a fresh checkout has no `.godot/` caches),
+copies the binary into `bin/`, and runs every headless harness. One input
+harness (`tools/input_scene_test.tscn`) is known-failing at baseline and is
+isolated with `continue-on-error` (see the README). Trust details live in
 [`threat-model.md`](threat-model.md).

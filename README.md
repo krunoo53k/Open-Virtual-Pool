@@ -27,8 +27,8 @@ checks the golden hash (`c399229b25faae5a`) — exits 0 when it agrees:
 godot --headless --path . scenes/smoke.tscn
 ```
 
-The `VersionStamp` scene prints and shows `PoolCore.get_model_version` (1.8) on
-any running screen, so the loaded extension can be identified while playing.
+The `VersionStamp` scene prints and shows `PoolCore.get_model_version` (1.10)
+on any running screen, so the loaded extension can be identified while playing.
 
 ## Self-play smoke
 
@@ -230,36 +230,37 @@ untrusted (reject invalid values, never clamp). Client-side local solving and
 opponent aim spoofing are accepted v1 limitations; a hash mismatch snaps and an
 `ERROR` rolls back.
 
-C1 stage 1 is in place: `RackState` carries flat core-frame f64 triples behind
-a legacy f32 bridge. Stage 2 is gated on `PoolSimulation.USE_F64_INTENT`, which
-stays `false` because the pinned engine rev has no `simulate_from_intent_f64`.
-Hotseat remains on the f32 path with a provisional sunset of **2027-06-30**
-until the engine entry point lands.
+C1 stage 2 is live: `RackState` carries flat core-frame f64 triples and online
+shots go through the engine's `simulate_from_intent_f64`, so no number loses
+precision at the GDExtension boundary. Hotseat still uses the legacy f32
+bridge with a provisional sunset of **2027-06-30**; the duplicate GDScript
+judge remains for hotseat only until it is retired. Parity with the Rust judge
+is already pinned by `tools/judge_parity_test.tscn` (54 fixtures).
 
-**E0 fact-check note:** the `VersionStamp` paragraph above still reads `1.8`,
-but the loaded engine reports model version **`1.9`**. That old line is left
-unchanged here on purpose; it is flagged as an E0 fact-check item in
-`docs/online-multiplayer.md`, not silently rewritten.
+The ruling preview calls the engine's shared Rust judge. HELLO sends the
+engine-published canary and protocol `1.0` / rules `1.0` versions.
 
 ## Platform matrix
 
 | Target | Status |
 |---|---|
-| Desktop Linux / Windows / macOS | **supported** — the only targets with a shipped extension binary manifest (`bin/pool_godot.gdextension`). |
-| Mobile Android / iOS | **pending G0 spike** — no on-device extension build verified. |
-| Web browser (wasm / gdext) | **pending G0 spike** — no gdext/web spike result exists on disk; no browser prediction asserted. |
+| Desktop Linux / Windows / macOS | **supported** — full extension, both hotseat f32 and online f64 paths; the 81-shot corpus runs on x86_64. |
+| Mobile Android / iOS | **corpus verified on aarch64, native playback pending** — no on-device gdext build shipped. |
+| Web browser | **out of scope for v1** — gdext-web needs an experimental Emscripten build. The v2 direction is a standalone wasm module of the shared pipeline. |
 
-Web becomes **supported** only when the extension loads in the browser, the
-engine canary matches, and local prediction runs and agrees with the pins.
-Until then web play uses the server-authoritative remote path.
+The engine's E0 spike also ran `pool-core` / `pool-intent` / `pool-rules` and
+the 81-shot corpus under wasm32-wasip1 as a determinism lane; that does not
+imply browser playback.
 
 ## Compatibility manifest and CI
 
 [`compat/compat.json`](compat/compat.json) pins the revisions this build is
-checked against: `core` `2a778c672aa3f5c7e21eca4d590bfe11adaee728`, `protocol` `1`, `model` `1.9`, with `rules`
-and `intent` still `null` (pending). **CI verifies this manifest**, then builds
-the engine at rev `2a778c672aa3f5c7e21eca4d590bfe11adaee728`, copies `libpool_godot.so` into `bin/`, and runs all
-headless harnesses under Godot 4.7. One input harness
+checked against: `core` `145dd3f2f2e33894afedcbcac05a3ca78e6ae2c0`,
+`protocol` `1.0`, `model` `1.10`, `rules` / `intent`
+`860b664886536e742ccb0a07a2823d9bc13a78ab`, canary `c8ee370c4195017f`.
+**CI verifies this manifest**, builds the engine at the pinned commit, copies
+`libpool_godot.so` into `bin/`, imports the project and runs all headless
+harnesses under Godot 4.7. One input harness
 (`tools/input_scene_test.tscn`) is known-failing at baseline pending
 input-harness triage; CI runs it in a `continue-on-error` step so the rest of
 the matrix still hard-fails.
